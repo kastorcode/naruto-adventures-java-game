@@ -4,6 +4,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import com.kastorcode.graphics.Spritesheet;
+import com.kastorcode.main.Window;
+import com.kastorcode.world.Camera;
+import com.kastorcode.world.World;
 
 
 public class Player extends Entity {
@@ -77,15 +80,26 @@ public class Player extends Entity {
 			frameIndex = 0;
 			frames = 0;
 		}
+		
+		Camera.setX(Camera.clamp(
+			getX() - (Window.WIDTH / 2),
+			0,
+			(World.WIDTH * 16) - Window.WIDTH
+		));
+		Camera.setY(Camera.clamp(
+			getY() - (Window.HEIGHT / 2),
+			0,
+			(World.HEIGHT * 16) - Window.HEIGHT
+		));
 	}
 	
 	
 	public void render (Graphics g) {
 		if (direction == rightDirection) {
-			g.drawImage(rightPlayer[frameIndex], getX(), getY(), null);
+			g.drawImage(rightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
 		}
 		else if (direction == leftDirection) {
-			g.drawImage(leftPlayer[frameIndex], getX(), getY(), null);
+			g.drawImage(leftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
 		}
 	}
 }

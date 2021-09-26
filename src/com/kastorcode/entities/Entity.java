@@ -3,8 +3,17 @@ package com.kastorcode.entities;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import com.kastorcode.graphics.Spritesheet;
+import com.kastorcode.world.Camera;
+
 
 public class Entity {
+	public static BufferedImage
+		LIFEPACK = Spritesheet.getSprite(7 * 16, 0, 16, 16),
+		WEAPON = Spritesheet.getSprite(7 * 16, 16, 16, 16),
+		BULLET = Spritesheet.getSprite(8 * 16, 0, 16, 16),
+		ENEMY = Spritesheet.getSprite(2 * 16, 2 * 16, 16, 16);
+
 	protected double x, y;
 
 	protected int width, height;
@@ -55,6 +64,6 @@ public class Entity {
 	
 	
 	public void render (Graphics g) {
-		g.drawImage(sprite, getX(), getY(), null);
+		g.drawImage(sprite, getX() - Camera.getX(), getY() - Camera.getY(), null);
 	}
 }

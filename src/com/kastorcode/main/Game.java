@@ -27,13 +27,13 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 	private BufferedImage image;
 	
-	public List<Entity> entities;
+	public static List<Entity> entities;
 	
 	public Spritesheet spritesheet;
 	
 	public World world;
 	
-	private Player player;
+	public static Player player;
 
 
 	public Game () {
@@ -45,10 +45,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		spritesheet = new Spritesheet("spritesheet.png");
-		world = new World("map.png");
 		player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
 
 		entities.add(player);
+
+		world = new World("map.png");
 	}
 
 

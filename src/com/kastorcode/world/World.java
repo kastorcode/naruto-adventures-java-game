@@ -7,6 +7,10 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.kastorcode.entities.*;
+import com.kastorcode.main.Game;
+import com.kastorcode.main.Window;
+
 
 public class World {
 	public static int WIDTH, HEIGHT;
@@ -26,6 +30,7 @@ public class World {
 			for (int xx = 0; xx < WIDTH; xx++) {
 				for (int yy = 0; yy < HEIGHT; yy++) {
 					int pixel = pixels[xx + (yy * WIDTH)];
+					tiles[xx + (yy * WIDTH)] = new FloorTile(xx * 16, yy * 16, Tile.TILE_FLOOR);
 
 					switch (pixel) {
 						// Floor
@@ -42,13 +47,32 @@ public class World {
 
 						// Player
 						case 0xFF0026FF: {
-							tiles[xx + (yy * WIDTH)] = new FloorTile(xx * 16, yy * 16, Tile.TILE_FLOOR);
+							Game.player.setX(xx * 16);
+							Game.player.setY(yy * 16);
 							break;
 						}
-
-						// Floor
-						default: {
-							tiles[xx + (yy * WIDTH)] = new FloorTile(xx * 16, yy * 16, Tile.TILE_FLOOR);
+						
+						// Enemy
+						case 0xFFFF0000: {
+							Game.entities.add(new Enemy(xx * 16, yy * 16, 16, 16, Entity.ENEMY));
+							break;
+						}
+						
+						// Weapon
+						case 0xFFFF6A00: {
+							Game.entities.add(new Weapon(xx * 16, yy * 16, 16, 16, Entity.WEAPON));
+							break;
+						}
+						
+						// Life pack
+						case 0xFFFF7F7F: {
+							Game.entities.add(new LifePack(xx * 16, yy * 16, 16, 16, Entity.LIFEPACK));
+							break;
+						}
+						
+						// Bullet
+						case 0xFFFFD800: {
+							Game.entities.add(new Bullet(xx * 16, yy * 16, 16, 16, Entity.BULLET));
 							break;
 						}
 					}
@@ -62,8 +86,16 @@ public class World {
 	
 	
 	public void render (Graphics g) {
-		for (int xx = 0; xx < WIDTH; xx++) {
-			for (int yy = 0; yy < HEIGHT; yy++) {
+		int xStart = Camera.getX() >> 4;
+		int yStart = Camera.getY() >> 4;
+		int xFinal = xStart + (Window.WIDTH >> 4);
+		int yFinal = yStart + (Window.HEIGHT >> 4);
+
+		for (int xx = xStart; xx <= xFinal; xx++) {
+			for (int yy = yStart; yy <= yFinal; yy++) {
+				if (xx < 0 || yy < 0 || xx >= WIDTH || yy >= HEIGHT)
+					continue;
+
 				Tile tile = tiles[xx + (yy * WIDTH)];
 				tile.render(g);
 			}
