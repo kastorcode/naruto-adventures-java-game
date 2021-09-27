@@ -13,9 +13,9 @@ public class Player extends Entity {
 	public boolean right, left, up, down;
 	
 	public int rightDirection = 0, leftDirection = 1,
-		direction = rightDirection, life = 100;
+		direction = rightDirection;
 
-	public double speed = 1.4;
+	public double speed = 1.4, life = 100, maxLife = 100;
 
 	private int frames = 0, maxFrames = 5,
 		frameIndex = 0, maxFrameIndex = maxFrames - 1;

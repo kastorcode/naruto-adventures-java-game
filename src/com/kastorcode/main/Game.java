@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,6 +16,7 @@ import com.kastorcode.entities.Enemy;
 import com.kastorcode.entities.Entity;
 import com.kastorcode.entities.Player;
 import com.kastorcode.graphics.Spritesheet;
+import com.kastorcode.graphics.UI;
 import com.kastorcode.world.World;
 
 
@@ -40,6 +40,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public static Player player;
 	
 	public static Random rand;
+	
+	public UI ui;
 
 
 	public Game () {
@@ -49,6 +51,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		addMouseListener(this);
 
 		rand = new Random();
+		ui = new UI();
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
@@ -116,7 +119,9 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			Entity entity = entities.get(i);
 			entity.render(g);
 		}
-		
+
+		ui.render(g);
+
 		g.dispose();
 
 		g = bs.getDrawGraphics();
