@@ -11,7 +11,9 @@ import java.awt.image.BufferedImage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import com.kastorcode.entities.Enemy;
 import com.kastorcode.entities.Entity;
 import com.kastorcode.entities.Player;
 import com.kastorcode.graphics.Spritesheet;
@@ -28,12 +30,16 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	private BufferedImage image;
 	
 	public static List<Entity> entities;
+
+	public static List<Enemy> enemies;
 	
 	public Spritesheet spritesheet;
 	
 	public World world;
 	
 	public static Player player;
+	
+	public static Random rand;
 
 
 	public Game () {
@@ -42,8 +48,10 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		addKeyListener(this);
 		addMouseListener(this);
 
+		rand = new Random();
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
+		enemies = new ArrayList<Enemy>();
 		spritesheet = new Spritesheet("spritesheet.png");
 		player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
 
