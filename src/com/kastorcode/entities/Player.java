@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import com.kastorcode.graphics.Spritesheet;
+import com.kastorcode.main.Game;
 import com.kastorcode.main.Window;
 import com.kastorcode.world.Camera;
 import com.kastorcode.world.World;
@@ -37,6 +38,25 @@ public class Player extends Entity {
 
 		for (int i = 0; i < maxFrames; i++) {
 			leftPlayer[i] = Spritesheet.getSprite(32 + (i * 16), 16, 16, 16);
+		}
+	}
+	
+	
+	public void checkCollisionLifePack () {
+		for (int i = 0; i < Game.entities.size(); i++) {
+			Entity entity = Game.entities.get(i);
+			
+			if (entity instanceof LifePack) {
+				if (Entity.isColliding(this, entity)) {
+					life += 8;
+					
+					if (life > 100) { life = 100; }
+					
+					Game.entities.remove(i);
+
+					return;
+				}
+			}
 		}
 	}
 	
@@ -80,7 +100,9 @@ public class Player extends Entity {
 			frameIndex = 0;
 			frames = 0;
 		}
-		
+
+		checkCollisionLifePack();
+
 		Camera.setX(Camera.clamp(
 			getX() - (Window.WIDTH / 2),
 			0,

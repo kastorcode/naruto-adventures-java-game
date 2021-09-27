@@ -90,9 +90,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 
 	public void tick () {
-		int entitiesSize = entities.size();
-		
-		for (int i = 0; i < entitiesSize; i++) {
+		for (int i = 0; i < entities.size(); i++) {
 			Entity entity = entities.get(i);
 			entity.tick();
 		}

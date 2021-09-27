@@ -1,10 +1,12 @@
 package com.kastorcode.entities;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.world.Camera;
+import com.kastorcode.world.Tile;
 
 
 public class Entity {
@@ -57,6 +59,14 @@ public class Entity {
 	
 	public int getHeight () {
 		return height;
+	}
+	
+	
+	public static boolean isColliding (Entity entity1, Entity entity2) {
+		Rectangle entity1Mask = new Rectangle(entity1.getX(), entity1.getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
+		Rectangle entity2Mask = new Rectangle(entity2.getX(), entity2.getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
+
+		return entity1Mask.intersects(entity2Mask);
 	}
 	
 	
