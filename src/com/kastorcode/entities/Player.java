@@ -13,7 +13,7 @@ public class Player extends Entity {
 	public boolean right, left, up, down;
 	
 	public int rightDirection = 0, leftDirection = 1,
-		direction = rightDirection;
+		direction = rightDirection, life = 100;
 
 	public double speed = 1.4;
 
