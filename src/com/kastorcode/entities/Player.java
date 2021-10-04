@@ -2,6 +2,7 @@ package com.kastorcode.entities;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.main.Game;
@@ -11,7 +12,7 @@ import com.kastorcode.world.World;
 
 
 public class Player extends Entity {
-	public boolean right, left, up, down;
+	public boolean right, left, up, down, isDamaged = false;
 	
 	public int rightDirection = 0, leftDirection = 1,
 		direction = rightDirection, munition = 0;
@@ -19,9 +20,11 @@ public class Player extends Entity {
 	public double speed = 1.4, life = 100, maxLife = 100;
 
 	private int frames = 0, maxFrames = 5,
-		frameIndex = 0, maxFrameIndex = maxFrames - 1;
+		frameIndex = 0, maxFrameIndex = maxFrames - 1, damageFrames = 0;
 
 	private boolean moved = false;
+
+	public BufferedImage[] damageRightPlayer, damageLeftPlayer;
 
 	private BufferedImage[] rightPlayer, leftPlayer;
 
@@ -31,13 +34,23 @@ public class Player extends Entity {
 		
 		rightPlayer = new BufferedImage[maxFrames];
 		leftPlayer = new BufferedImage[maxFrames];
+		damageRightPlayer = new BufferedImage[maxFrames];
+		damageLeftPlayer = new BufferedImage[maxFrames];
 		
 		for (int i = 0; i < maxFrames; i++) {
-			rightPlayer[i] = Spritesheet.getSprite(32 + (i * 16), 0, 16, 16);
+			rightPlayer[i] = Spritesheet.getSprite(i * 16, 16, 16, 16);
 		}
 
 		for (int i = 0; i < maxFrames; i++) {
-			leftPlayer[i] = Spritesheet.getSprite(32 + (i * 16), 16, 16, 16);
+			leftPlayer[i] = Spritesheet.getSprite(i * 16, 32, 16, 16);
+		}
+		
+		for (int i = 0; i < maxFrames; i++) {
+			damageRightPlayer[i] = Spritesheet.getSprite(i * 16, 48, 16, 16);
+		}
+
+		for (int i = 0; i < maxFrames; i++) {
+			damageLeftPlayer[i] = Spritesheet.getSprite(i * 16, 64, 16, 16);
 		}
 	}
 	
@@ -119,6 +132,27 @@ public class Player extends Entity {
 
 		checkCollisionLifePack();
 		checkCollisionMunition();
+		
+		if (isDamaged) {
+			damageFrames++;
+			
+			if (damageFrames == 8) {
+				damageFrames = 0;
+				isDamaged = false;
+			}
+		}
+		
+		if (life < 1) {
+			Game.entities = new ArrayList<Entity>();
+			Game.enemies = new ArrayList<Enemy>();
+			Game.spritesheet = new Spritesheet("spritesheet.png");
+			Game.player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
+
+			Game.entities.add(Game.player);
+
+			Game.world = new World("map.png");
+			return;
+		}
 
 		Camera.setX(Camera.clamp(
 			getX() - (Window.WIDTH / 2),
@@ -134,11 +168,21 @@ public class Player extends Entity {
 	
 	
 	public void render (Graphics g) {
-		if (direction == rightDirection) {
-			g.drawImage(rightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+		if (isDamaged) {
+			if (direction == rightDirection) {
+				g.drawImage(damageRightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
+			else if (direction == leftDirection) {
+				g.drawImage(damageLeftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
 		}
-		else if (direction == leftDirection) {
-			g.drawImage(leftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+		else {
+			if (direction == rightDirection) {
+				g.drawImage(rightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
+			else if (direction == leftDirection) {
+				g.drawImage(leftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
 		}
 	}
 }

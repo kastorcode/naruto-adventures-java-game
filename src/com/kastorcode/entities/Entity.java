@@ -11,9 +11,9 @@ import com.kastorcode.world.Tile;
 
 public class Entity {
 	public static BufferedImage
-		LIFEPACK = Spritesheet.getSprite(7 * 16, 0, 16, 16),
-		WEAPON = Spritesheet.getSprite(7 * 16, 16, 16, 16),
-		BULLET = Spritesheet.getSprite(8 * 16, 0, 16, 16),
+		LIFEPACK = Spritesheet.getSprite(32, 0, 16, 16),
+		WEAPON = Spritesheet.getSprite(48, 0, 16, 16),
+		BULLET = Spritesheet.getSprite(64, 0, 16, 16),
 		ENEMY = Spritesheet.getSprite(2 * 16, 2 * 16, 16, 16);
 
 	protected double x, y;

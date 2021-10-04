@@ -33,9 +33,9 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 	public static List<Enemy> enemies;
 	
-	public Spritesheet spritesheet;
+	public static Spritesheet spritesheet;
 	
-	public World world;
+	public static World world;
 	
 	public static Player player;
 	

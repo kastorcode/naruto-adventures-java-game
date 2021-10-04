@@ -32,11 +32,11 @@ public class Enemy extends Entity {
 		leftEnemy = new BufferedImage[maxFrames];
 
 		for (int i = 0; i < maxFrames; i++) {
-			rightEnemy[i] = Spritesheet.getSprite(32 + (i * 16), 32, 16, 16);
+			rightEnemy[i] = Spritesheet.getSprite(80 + (i * 16), 16, 16, 16);
 		}
 
 		for (int i = 0; i < maxFrames; i++) {
-			leftEnemy[i] = Spritesheet.getSprite(32 + (i * 16), 48, 16, 16);
+			leftEnemy[i] = Spritesheet.getSprite(80 + (i * 16), 32, 16, 16);
 		}
 	}
 	
@@ -46,11 +46,8 @@ public class Enemy extends Entity {
 		
 		if (isCollidingWithPlayer()) {
 			if (Game.rand.nextInt(100) < 10) {
+				Game.player.isDamaged = true;
 				Game.player.life -= Game.rand.nextInt(3);
-				
-				if (Game.player.life < 1) {
-					System.out.println("Game Over!");
-				}
 			}
 		}
 		else if (Game.rand.nextInt(100) < 75) {
