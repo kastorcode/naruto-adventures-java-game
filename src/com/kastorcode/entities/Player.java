@@ -14,7 +14,7 @@ public class Player extends Entity {
 	public boolean right, left, up, down;
 	
 	public int rightDirection = 0, leftDirection = 1,
-		direction = rightDirection;
+		direction = rightDirection, munition = 0;
 
 	public double speed = 1.4, life = 100, maxLife = 100;
 
@@ -38,6 +38,22 @@ public class Player extends Entity {
 
 		for (int i = 0; i < maxFrames; i++) {
 			leftPlayer[i] = Spritesheet.getSprite(32 + (i * 16), 16, 16, 16);
+		}
+	}
+	
+	
+	public void checkCollisionMunition () {
+		for (int i = 0; i < Game.entities.size(); i++) {
+			Entity entity = Game.entities.get(i);
+			
+			if (entity instanceof Bullet) {
+				if (Entity.isColliding(this, entity)) {
+					munition += 10;
+					Game.entities.remove(i);
+
+					return;
+				}
+			}
 		}
 	}
 	
@@ -102,6 +118,7 @@ public class Player extends Entity {
 		}
 
 		checkCollisionLifePack();
+		checkCollisionMunition();
 
 		Camera.setX(Camera.clamp(
 			getX() - (Window.WIDTH / 2),
