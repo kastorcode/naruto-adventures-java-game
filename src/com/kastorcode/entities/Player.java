@@ -12,17 +12,18 @@ import com.kastorcode.world.World;
 
 
 public class Player extends Entity {
-	public boolean right, left, up, down, isDamaged = false;
+	public boolean right, left, up, down, isDamaged = false,
+		shoot = false, mouseShoot = false;
 	
 	public int rightDirection = 0, leftDirection = 1,
-		direction = rightDirection, munition = 0;
+		direction = rightDirection, munition = 10000 /*0*/, mx, my;
 
-	public double speed = 1.4, life = 100, maxLife = 100;
+	public double speed = 1.4, life = 10000 /*100*/, maxLife = 100;
 
 	private int frames = 0, maxFrames = 5,
 		frameIndex = 0, maxFrameIndex = maxFrames - 1, damageFrames = 0;
 
-	private boolean moved = false;
+	private boolean moved = false, hasWeapon = false;
 
 	public BufferedImage[] damageRightPlayer, damageLeftPlayer;
 
@@ -51,6 +52,22 @@ public class Player extends Entity {
 
 		for (int i = 0; i < maxFrames; i++) {
 			damageLeftPlayer[i] = Spritesheet.getSprite(i * 16, 64, 16, 16);
+		}
+	}
+	
+	
+	public void checkCollisionWeapon () {
+		for (int i = 0; i < Game.entities.size(); i++) {
+			Entity entity = Game.entities.get(i);
+			
+			if (entity instanceof Weapon) {
+				if (Entity.isColliding(this, entity)) {
+					hasWeapon = true;
+					Game.entities.remove(i);
+
+					return;
+				}
+			}
 		}
 	}
 	
@@ -131,6 +148,7 @@ public class Player extends Entity {
 		}
 
 		checkCollisionLifePack();
+		checkCollisionWeapon();
 		checkCollisionMunition();
 		
 		if (isDamaged) {
@@ -139,6 +157,50 @@ public class Player extends Entity {
 			if (damageFrames == 8) {
 				damageFrames = 0;
 				isDamaged = false;
+			}
+		}
+		
+		if (shoot) {
+			shoot = false;
+			
+			if (hasWeapon && munition > 0) {
+				munition--;
+				int dx, px = 0, py = 0;
+				
+				if (direction == rightDirection) {
+					dx = 1;
+				}
+				else {
+					px = -4;
+					dx = -1;
+				}
+				
+				BulletShoot bullet = new BulletShoot(getX() + px, getY() + py, 3, 3, null, dx, 0);
+				Game.bullets.add(bullet);
+			}
+		}
+		
+		if (mouseShoot) {
+			mouseShoot = false;
+			
+			if (hasWeapon && munition > 0) {
+				munition--;
+
+				int px = 0, py = 0;
+
+				if (direction == leftDirection) {
+					px = -4;
+				}
+				
+				double angle = Math.atan2(
+					my - (getY() + py - Camera.y),
+					mx - (getX() + px - Camera.x)
+				);
+				
+				double dx = Math.cos(angle), dy = Math.sin(angle);
+				
+				BulletShoot bullet = new BulletShoot(getX() + px, getY() + py, 3, 3, null, dx, dy);
+				Game.bullets.add(bullet);
 			}
 		}
 		
@@ -171,17 +233,33 @@ public class Player extends Entity {
 		if (isDamaged) {
 			if (direction == rightDirection) {
 				g.drawImage(damageRightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+
+				if (hasWeapon) {
+					g.drawImage(Entity.DAMAGED_PLAYER_WEAPON, getX() - Camera.getX(), getY() - Camera.getY(), null);
+				}
 			}
 			else if (direction == leftDirection) {
 				g.drawImage(damageLeftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+
+				if (hasWeapon) {
+					g.drawImage(Entity.DAMAGED_PLAYER_WEAPON, getX() - 8 - Camera.getX(), getY() - Camera.getY(), null);
+				}
 			}
 		}
 		else {
 			if (direction == rightDirection) {
 				g.drawImage(rightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+				
+				if (hasWeapon) {
+					g.drawImage(Entity.PLAYER_WEAPON, getX() - Camera.getX(), getY() - Camera.getY(), null);
+				}
 			}
 			else if (direction == leftDirection) {
 				g.drawImage(leftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+				
+				if (hasWeapon) {
+					g.drawImage(Entity.PLAYER_WEAPON, getX() - 8 - Camera.getX(), getY() - Camera.getY(), null);
+				}
 			}
 		}
 	}

@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.kastorcode.entities.BulletShoot;
 import com.kastorcode.entities.Enemy;
 import com.kastorcode.entities.Entity;
 import com.kastorcode.entities.Player;
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.graphics.UI;
+import com.kastorcode.world.Camera;
 import com.kastorcode.world.World;
 
 
@@ -32,6 +34,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public static List<Entity> entities;
 
 	public static List<Enemy> enemies;
+	
+	public static List<BulletShoot> bullets;
 	
 	public static Spritesheet spritesheet;
 	
@@ -55,6 +59,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
+		bullets = new ArrayList<BulletShoot>();
 		spritesheet = new Spritesheet("spritesheet.png");
 		player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
 
@@ -94,6 +99,10 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			Entity entity = entities.get(i);
 			entity.tick();
 		}
+		
+		for (int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).tick();
+		}
 	}
 
 
@@ -112,10 +121,13 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		
 		world.render(g);
 
-		int entitiesSize = entities.size();
-		for (int i = 0; i < entitiesSize; i++) {
+		for (int i = 0; i < entities.size(); i++) {
 			Entity entity = entities.get(i);
 			entity.render(g);
+		}
+		
+		for (int i = 0; i < bullets.size(); i++) {
+			bullets.get(i).render(g);
 		}
 
 		ui.render(g);
@@ -175,6 +187,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			case KeyEvent.VK_A: {
 				player.left = true;
 				break;
+			}
+			
+			case KeyEvent.VK_X:
+			case KeyEvent.VK_SPACE: {
+				player.shoot = true;
 			}
 		}
 		
@@ -251,7 +268,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 
 	@Override
-	public void mousePressed (MouseEvent e) {}
+	public void mousePressed (MouseEvent e) {
+		player.mouseShoot = true;
+		player.mx = e.getX() / Window.SCALE;
+		player.my = e.getY() / Window.SCALE;
+	}
 
 
 	@Override
