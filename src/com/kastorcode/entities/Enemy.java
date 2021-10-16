@@ -18,11 +18,16 @@ public class Enemy extends Entity {
 	private double speed = 0.6;
 	
 	private int frames = 0, maxFrames = 5,
-			frameIndex = 0, maxFrameIndex = maxFrames - 1;
+		frameIndex = 0, maxFrameIndex = maxFrames - 1,
+		damageFrames = 0, life = 10;
 	
 	private boolean moved = false;
 	
+	public boolean isDamaged = false;
+	
 	private BufferedImage[] rightEnemy, leftEnemy;
+	
+	public BufferedImage[] damageRightEnemy, damageLeftEnemy;
 
 
 	public Enemy(double x, double y, int width, int height, BufferedImage sprite) {
@@ -30,6 +35,8 @@ public class Enemy extends Entity {
 		
 		rightEnemy = new BufferedImage[maxFrames];
 		leftEnemy = new BufferedImage[maxFrames];
+		damageRightEnemy = new BufferedImage[maxFrames];
+		damageLeftEnemy = new BufferedImage[maxFrames];
 
 		for (int i = 0; i < maxFrames; i++) {
 			rightEnemy[i] = Spritesheet.getSprite(80 + (i * 16), 16, 16, 16);
@@ -37,6 +44,14 @@ public class Enemy extends Entity {
 
 		for (int i = 0; i < maxFrames; i++) {
 			leftEnemy[i] = Spritesheet.getSprite(80 + (i * 16), 32, 16, 16);
+		}
+		
+		for (int i = 0; i < maxFrames; i++) {
+			damageRightEnemy[i] = Spritesheet.getSprite(80 + (i * 16), 48, 16, 16);
+		}
+		
+		for (int i = 0; i < maxFrames; i++) {
+			damageLeftEnemy[i] = Spritesheet.getSprite(80 + (i * 16), 64, 16, 16);
 		}
 	}
 	
@@ -99,6 +114,44 @@ public class Enemy extends Entity {
 				frameIndex = 0;
 				frames = 0;
 			}
+
+			isCollidingWithBullet();
+			
+			if (life < 1) {
+				destroySelf();
+				return;
+			}
+			
+			if (isDamaged) {
+				damageFrames++;
+				
+				if (damageFrames == 8) {
+					damageFrames = 0;
+					isDamaged = false;
+				}
+			}
+		}
+	}
+	
+	
+	public void destroySelf () {
+		Game.entities.remove(this);
+		return;
+	}
+	
+	
+	public void isCollidingWithBullet () {
+		for (int i = 0; i < Game.bullets.size(); i++) {
+			Entity e = Game.bullets.get(i);
+			
+			if (e instanceof BulletShoot) {
+				if (Entity.isColliding(this, e)) {
+					isDamaged = true;
+					life -= 5;
+					Game.bullets.remove(i);
+					return;
+				}
+			}
 		}
 	}
 	
@@ -132,11 +185,21 @@ public class Enemy extends Entity {
 	
 	
 	public void render (Graphics g) {
-		if (direction == rightDirection) {
-			g.drawImage(rightEnemy[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+		if (isDamaged) {
+			if (direction == rightDirection) {
+				g.drawImage(damageRightEnemy[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
+			else if (direction == leftDirection) {
+				g.drawImage(damageLeftEnemy[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
 		}
-		else if (direction == leftDirection) {
-			g.drawImage(leftEnemy[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+		else {
+			if (direction == rightDirection) {
+				g.drawImage(rightEnemy[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
+			else if (direction == leftDirection) {
+				g.drawImage(leftEnemy[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+			}
 		}
 	}
 }
