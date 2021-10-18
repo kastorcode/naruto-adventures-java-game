@@ -2,7 +2,6 @@ package com.kastorcode.entities;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.main.Game;
@@ -205,15 +204,8 @@ public class Player extends Entity {
 		}
 		
 		if (life < 1) {
-			Game.entities = new ArrayList<Entity>();
-			Game.enemies = new ArrayList<Enemy>();
-			Game.spritesheet = new Spritesheet("spritesheet.png");
-			Game.player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
-
-			Game.entities.add(Game.player);
-
-			Game.world = new World("map.png");
-			return;
+			life = 0;
+			Game.state = "GAME_OVER";
 		}
 
 		Camera.setX(Camera.clamp(

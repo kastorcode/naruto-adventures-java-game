@@ -1,7 +1,9 @@
 package com.kastorcode.main;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -18,7 +20,6 @@ import com.kastorcode.entities.Entity;
 import com.kastorcode.entities.Player;
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.graphics.UI;
-import com.kastorcode.world.Camera;
 import com.kastorcode.world.World;
 
 
@@ -27,9 +28,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 	private Thread thread;
 
-	private boolean isRunning;
+	private boolean isRunning, restart = false, showGameOverMessage = true;
 
 	private BufferedImage image;
+	
+	private int currentLevel = 1, maxLevel = 2, framesGameOverMessage = 0;
 	
 	public static List<Entity> entities;
 
@@ -46,6 +49,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public static Random rand;
 	
 	public UI ui;
+	
+	public static String state = "GAME_OVER";//NORMAL
 
 
 	public Game () {
@@ -65,7 +70,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 		entities.add(player);
 
-		world = new World("map.png");
+		world = new World("level1.png");
 	}
 
 
@@ -95,14 +100,56 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 
 	public void tick () {
-		for (int i = 0; i < entities.size(); i++) {
-			Entity entity = entities.get(i);
-			entity.tick();
+		if (state == "NORMAL") {
+			restart = false;
+
+			for (int i = 0; i < entities.size(); i++) {
+				Entity entity = entities.get(i);
+				entity.tick();
+			}
+			
+			for (int i = 0; i < bullets.size(); i++) {
+				bullets.get(i).tick();
+			}
+			
+			if (enemies.size() == 0) {
+				currentLevel++;
+				
+				if (currentLevel > maxLevel) {
+					currentLevel = 1;
+				}
+				
+				String newWorld = "level" + currentLevel + ".png";
+				over(newWorld);
+			}
 		}
-		
-		for (int i = 0; i < bullets.size(); i++) {
-			bullets.get(i).tick();
+		else if (state == "GAME_OVER") {
+			framesGameOverMessage++;
+			
+			if (framesGameOverMessage == 48) {
+				framesGameOverMessage = 0;
+				showGameOverMessage = !showGameOverMessage;
+			}
+			
+			if (restart) {
+				state = "NORMAL";
+				currentLevel = 1;
+				over("level" + currentLevel + ".png");
+			}
 		}
+	}
+
+
+	public static void over (String level) {
+		entities = new ArrayList<Entity>();
+		enemies = new ArrayList<Enemy>();
+		spritesheet = new Spritesheet("spritesheet.png");
+		player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
+
+		entities.add(player);
+
+		world = new World("/" + level);
+		return;
 	}
 
 
@@ -137,6 +184,23 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		g = bs.getDrawGraphics();
 
 		g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
+		
+		if (state == "GAME_OVER") {
+			Graphics2D g2 = (Graphics2D)g;
+
+			g2.setColor(new Color(0, 0, 0, 100));
+			g2.fillRect(0, 0, Window.WIDTH * Window.SCALE, Window.HEIGHT * Window.SCALE);
+
+			g.setFont(new Font("arial", Font.BOLD, 32));
+			g.setColor(Color.WHITE);
+			g.drawString("Game Over", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2);
+
+			if (showGameOverMessage) {
+				g.setFont(new Font("arial", Font.PLAIN, 16));
+				g.drawString("> Pressione Enter para reiniciar", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2 + 32);
+			}
+		}
+
 		bs.show();
 	}
 
@@ -192,6 +256,12 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			case KeyEvent.VK_X:
 			case KeyEvent.VK_SPACE: {
 				player.shoot = true;
+			}
+			
+			case KeyEvent.VK_ENTER:
+			case KeyEvent.VK_BACK_SPACE: {
+				restart = true;
+				break;
 			}
 		}
 		
