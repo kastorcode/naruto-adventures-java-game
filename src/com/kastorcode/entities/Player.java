@@ -208,6 +208,11 @@ public class Player extends Entity {
 			Game.state = "GAME_OVER";
 		}
 
+		updateCamera();
+	}
+
+
+	public void updateCamera () {
 		Camera.setX(Camera.clamp(
 			getX() - (Window.WIDTH / 2),
 			0,
@@ -219,8 +224,8 @@ public class Player extends Entity {
 			(World.HEIGHT * 16) - Window.HEIGHT
 		));
 	}
-	
-	
+
+
 	public void render (Graphics g) {
 		if (isDamaged) {
 			if (direction == rightDirection) {

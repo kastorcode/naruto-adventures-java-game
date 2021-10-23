@@ -48,9 +48,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	
 	public static Random rand;
 	
+	public Menu menu;
+
 	public UI ui;
 	
-	public static String state = "GAME_OVER";//NORMAL
+	public static String state = "MENU";
 
 
 	public Game () {
@@ -71,6 +73,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		entities.add(player);
 
 		world = new World("level1.png");
+		menu = new Menu();
 	}
 
 
@@ -100,41 +103,52 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 
 	public void tick () {
-		if (state == "NORMAL") {
-			restart = false;
-
-			for (int i = 0; i < entities.size(); i++) {
-				Entity entity = entities.get(i);
-				entity.tick();
-			}
-			
-			for (int i = 0; i < bullets.size(); i++) {
-				bullets.get(i).tick();
-			}
-			
-			if (enemies.size() == 0) {
-				currentLevel++;
-				
-				if (currentLevel > maxLevel) {
-					currentLevel = 1;
+		switch (state) {
+			case "NORMAL": {
+				restart = false;
+	
+				for (int i = 0; i < entities.size(); i++) {
+					Entity entity = entities.get(i);
+					entity.tick();
 				}
 				
-				String newWorld = "level" + currentLevel + ".png";
-				over(newWorld);
+				for (int i = 0; i < bullets.size(); i++) {
+					bullets.get(i).tick();
+				}
+				
+				if (enemies.size() == 0) {
+					currentLevel++;
+					
+					if (currentLevel > maxLevel) {
+						currentLevel = 1;
+					}
+					
+					String newWorld = "level" + currentLevel + ".png";
+					over(newWorld);
+				}
+
+				break;
 			}
-		}
-		else if (state == "GAME_OVER") {
-			framesGameOverMessage++;
-			
-			if (framesGameOverMessage == 48) {
-				framesGameOverMessage = 0;
-				showGameOverMessage = !showGameOverMessage;
+			case "GAME_OVER": {
+				framesGameOverMessage++;
+				
+				if (framesGameOverMessage == 48) {
+					framesGameOverMessage = 0;
+					showGameOverMessage = !showGameOverMessage;
+				}
+				
+				if (restart) {
+					state = "NORMAL";
+					currentLevel = 1;
+					over("level" + currentLevel + ".png");
+				}
+				
+				break;
 			}
 			
-			if (restart) {
-				state = "NORMAL";
-				currentLevel = 1;
-				over("level" + currentLevel + ".png");
+			case "MENU": {
+				menu.tick();
+				break;
 			}
 		}
 	}
@@ -185,19 +199,28 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 		g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
 		
-		if (state == "GAME_OVER") {
-			Graphics2D g2 = (Graphics2D)g;
-
-			g2.setColor(new Color(0, 0, 0, 100));
-			g2.fillRect(0, 0, Window.WIDTH * Window.SCALE, Window.HEIGHT * Window.SCALE);
-
-			g.setFont(new Font("arial", Font.BOLD, 32));
-			g.setColor(Color.WHITE);
-			g.drawString("Game Over", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2);
-
-			if (showGameOverMessage) {
-				g.setFont(new Font("arial", Font.PLAIN, 16));
-				g.drawString("> Pressione Enter para reiniciar", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2 + 32);
+		switch (state) {
+			case "GAME_OVER": {
+				Graphics2D g2 = (Graphics2D)g;
+	
+				g2.setColor(new Color(0, 0, 0, 100));
+				g2.fillRect(0, 0, Window.WIDTH * Window.SCALE, Window.HEIGHT * Window.SCALE);
+	
+				g.setFont(new Font("arial", Font.BOLD, 32));
+				g.setColor(Color.WHITE);
+				g.drawString("Game Over", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2);
+	
+				if (showGameOverMessage) {
+					g.setFont(new Font("arial", Font.PLAIN, 16));
+					g.drawString("> Pressione Enter para reiniciar", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2 + 32);
+				}
+	
+				break;
+			}
+			
+			case "MENU": {
+				menu.render(g);
+				break;
 			}
 		}
 
@@ -259,22 +282,53 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			}
 			
 			case KeyEvent.VK_ENTER:
-			case KeyEvent.VK_BACK_SPACE: {
+			case KeyEvent.VK_SHIFT: {
 				restart = true;
 				break;
+			}
+			
+			case KeyEvent.VK_ESCAPE:
+			case KeyEvent.VK_BACK_SPACE: {
+				switch (state) {
+					case "NORMAL": {
+						menu.pause = true;
+						state = "MENU";
+						break;
+					}
+				}
 			}
 		}
 		
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
 			case KeyEvent.VK_W: {
-				player.up = true;
+				switch (state) {
+					case "NORMAL": {
+						player.up = true;
+						break;
+					}
+					
+					case "MENU": {
+						menu.up = true;
+						break;
+					}
+				}
 				break;
 			}
 			
 			case KeyEvent.VK_DOWN:
 			case KeyEvent.VK_S: {
-				player.down = true;
+				switch (state) {
+					case "NORMAL": {
+						player.down = true;
+						break;
+					}
+					
+					case "MENU": {
+						menu.down = true;
+						break;
+					}
+				}
 				break;
 			}
 		}
@@ -308,6 +362,16 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			case KeyEvent.VK_S: {
 				player.down = false;
 				break;
+			}
+			
+			case KeyEvent.VK_ENTER:
+			case KeyEvent.VK_SHIFT: {
+				switch (state) {
+					case "MENU": {
+						menu.enter = true;
+						break;
+					}
+				}
 			}
 		}
 	}
