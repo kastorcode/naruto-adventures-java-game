@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.main.Game;
+import com.kastorcode.main.Sound;
 import com.kastorcode.world.Camera;
 import com.kastorcode.world.Tile;
 import com.kastorcode.world.World;
@@ -61,6 +62,7 @@ public class Enemy extends Entity {
 		
 		if (isCollidingWithPlayer()) {
 			if (Game.rand.nextInt(100) < 10) {
+				Sound.HURT_EFFECT.play();
 				Game.player.isDamaged = true;
 				Game.player.life -= Game.rand.nextInt(3);
 			}

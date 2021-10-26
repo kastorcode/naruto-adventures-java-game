@@ -57,6 +57,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 	public Game () {
 		super();
+		
+		Sound.BG_MUSIC.loop();
 
 		addKeyListener(this);
 		addMouseListener(this);
