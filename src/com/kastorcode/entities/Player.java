@@ -1,5 +1,6 @@
 package com.kastorcode.entities;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -12,15 +13,19 @@ import com.kastorcode.world.World;
 
 public class Player extends Entity {
 	public boolean right, left, up, down, isDamaged = false,
-		shoot = false, mouseShoot = false;
+		shoot = false, mouseShoot = false, jump = false,
+		isJumping = false, jumpUp = false, jumpDown = false;
 	
 	public int rightDirection = 0, leftDirection = 1,
-		direction = rightDirection, munition = 10000 /*0*/, mx, my;
+		direction = rightDirection, munition = 10000 /*0*/,
+		mx, my, z = 0, jumpFrames = 50, jumpCurrentFrame = 0,
+		jumpSpeed = 1;
 
 	public double speed = 1.4, life = 10000 /*100*/, maxLife = 100;
 
 	private int frames = 0, maxFrames = 5,
-		frameIndex = 0, maxFrameIndex = maxFrames - 1, damageFrames = 0;
+		frameIndex = 0, maxFrameIndex = maxFrames - 1,
+		damageFrames = 0;
 
 	private boolean moved = false, hasWeapon = false;
 
@@ -107,24 +112,53 @@ public class Player extends Entity {
 	
 	
 	public void tick () {
+		if (jump) {
+			if (isJumping == false) {
+				jump = false;
+				isJumping = true;
+				jumpUp = true;
+			}
+		}
+		
+		if (isJumping) {
+			if (jumpUp) {
+				jumpCurrentFrame += jumpSpeed;
+			}
+			else if (jumpDown) {
+				jumpCurrentFrame -= jumpSpeed;
+				
+				if (jumpCurrentFrame < 1) {
+					isJumping = false;
+					jumpUp = false;
+					jumpDown = false;
+				}
+			}
+			z = jumpCurrentFrame;
+			
+			if (jumpCurrentFrame >= jumpFrames) {
+				jumpUp = false;
+				jumpDown = true;
+			}
+		}
+
 		moved = false;
 
-		if (right && World.isFree((int)(x + speed), getY())) {
+		if (right && World.isFree((int)(x + speed), getY(), z)) {
 			moved = true;
 			direction = rightDirection;
 			setX(x += speed);
 		}
-		else if (left && World.isFree((int)(x - speed), getY())) {
+		else if (left && World.isFree((int)(x - speed), getY(), z)) {
 			moved = true;
 			direction = leftDirection;
 			setX(x -= speed);
 		}
 		
-		if (up && World.isFree(getX(), (int)(y - speed))) {
+		if (up && World.isFree(getX(), (int)(y - speed), z)) {
 			moved = true;
 			setY(y -= speed);
 		}
-		else if (down && World.isFree(getX(), (int)(y + speed))) {
+		else if (down && World.isFree(getX(), (int)(y + speed), z)) {
 			moved = true;
 			setY(y += speed);
 		}
@@ -229,35 +263,40 @@ public class Player extends Entity {
 	public void render (Graphics g) {
 		if (isDamaged) {
 			if (direction == rightDirection) {
-				g.drawImage(damageRightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+				g.drawImage(damageRightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY() - z, null);
 
 				if (hasWeapon) {
-					g.drawImage(Entity.DAMAGED_PLAYER_WEAPON, getX() - Camera.getX(), getY() - Camera.getY(), null);
+					g.drawImage(Entity.DAMAGED_PLAYER_WEAPON, getX() - Camera.getX(), getY() - Camera.getY() - z, null);
 				}
 			}
 			else if (direction == leftDirection) {
-				g.drawImage(damageLeftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+				g.drawImage(damageLeftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY() - z, null);
 
 				if (hasWeapon) {
-					g.drawImage(Entity.DAMAGED_PLAYER_WEAPON, getX() - 8 - Camera.getX(), getY() - Camera.getY(), null);
+					g.drawImage(Entity.DAMAGED_PLAYER_WEAPON, getX() - 8 - Camera.getX(), getY() - Camera.getY() - z, null);
 				}
 			}
 		}
 		else {
 			if (direction == rightDirection) {
-				g.drawImage(rightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+				g.drawImage(rightPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY() - z, null);
 				
 				if (hasWeapon) {
-					g.drawImage(Entity.PLAYER_WEAPON, getX() - Camera.getX(), getY() - Camera.getY(), null);
+					g.drawImage(Entity.PLAYER_WEAPON, getX() - Camera.getX(), getY() - Camera.getY() - z, null);
 				}
 			}
 			else if (direction == leftDirection) {
-				g.drawImage(leftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY(), null);
+				g.drawImage(leftPlayer[frameIndex], getX() - Camera.getX(), getY() - Camera.getY() - z, null);
 				
 				if (hasWeapon) {
-					g.drawImage(Entity.PLAYER_WEAPON, getX() - 8 - Camera.getX(), getY() - Camera.getY(), null);
+					g.drawImage(Entity.PLAYER_WEAPON, getX() - 8 - Camera.getX(), getY() - Camera.getY() - z, null);
 				}
 			}
+		}
+		
+		if (isJumping) {
+			g.setColor(Color.BLACK);
+			g.fillOval(getX() - Camera.getX() + 4, getY() - Camera.getY() + 16, 8, 8);
 		}
 	}
 }

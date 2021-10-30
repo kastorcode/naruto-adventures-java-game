@@ -278,6 +278,12 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 				break;
 			}
 			
+			case KeyEvent.VK_Z:
+			case KeyEvent.VK_J: {
+				player.jump = true;
+				break;
+			}
+			
 			case KeyEvent.VK_X:
 			case KeyEvent.VK_SPACE: {
 				player.shoot = true;

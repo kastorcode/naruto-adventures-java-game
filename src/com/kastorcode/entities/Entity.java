@@ -18,7 +18,7 @@ public class Entity {
 		PLAYER_WEAPON = Spritesheet.getSprite(5 * 16, 0, 16, 16),
 		DAMAGED_PLAYER_WEAPON = Spritesheet.getSprite(6 * 16, 0, 16, 16);
 
-	protected double x, y;
+	protected double x, y, z;
 
 	protected int width, height;
 	
@@ -67,11 +67,10 @@ public class Entity {
 	public static boolean isColliding (Entity entity1, Entity entity2) {
 		Rectangle entity1Mask = new Rectangle(entity1.getX(), entity1.getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
 		Rectangle entity2Mask = new Rectangle(entity2.getX(), entity2.getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
-
 		return entity1Mask.intersects(entity2Mask);
 	}
-	
-	
+
+
 	public void tick () {}
 	
 	

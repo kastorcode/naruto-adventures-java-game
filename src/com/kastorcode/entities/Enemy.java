@@ -69,7 +69,7 @@ public class Enemy extends Entity {
 		}
 		else if (Game.rand.nextInt(100) < 75) {
 			if (x < Game.player.getX() &&
-				World.isFree((int)(x + speed), getY()) &&
+				World.isFree((int)(x + speed), getY(), 0) &&
 				!isColliding((int)(x + speed), getY())
 			) {
 				moved = true;
@@ -77,7 +77,7 @@ public class Enemy extends Entity {
 				x += speed;
 			}
 			else if (x > Game.player.getX() &&
-				World.isFree((int)(x - speed), getY()) &&
+				World.isFree((int)(x - speed), getY(), 0) &&
 				!isColliding((int)(x - speed), getY())
 			) {
 				moved = true;
@@ -86,14 +86,14 @@ public class Enemy extends Entity {
 			}
 	
 			if (y < Game.player.getY() &&
-				World.isFree(getX(), (int)(y + speed)) &&
+				World.isFree(getX(), (int)(y + speed), 0) &&
 				!isColliding(getX(), (int)(y + speed))
 			) {
 				moved = true;
 				y += speed;
 			}
 			else if (y > Game.player.getY() &&
-				World.isFree(getX(), (int)(y - speed)) &&
+				World.isFree(getX(), (int)(y - speed), 0) &&
 				!isColliding(getX(), (int)(y - speed))
 			) {
 				moved = true;
@@ -163,7 +163,13 @@ public class Enemy extends Entity {
 		Rectangle currentEnemy = new Rectangle(getX(), getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
 		Rectangle player = new Rectangle(Game.player.getX(), Game.player.getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
 
-		return currentEnemy.intersects(player);
+		if (currentEnemy.intersects(player) &&
+			this.z == Game.player.z
+		) {
+			return true;
+		}
+
+		return false;
 	}
 	
 	
