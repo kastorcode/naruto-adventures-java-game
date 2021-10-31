@@ -53,6 +53,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public UI ui;
 	
 	public static String state = "MENU";
+	
+	public boolean saveGame = false;
 
 
 	public Game () {
@@ -107,6 +109,13 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public void tick () {
 		switch (state) {
 			case "NORMAL": {
+				if (saveGame) {
+					saveGame = false;
+					String[] keys = { "level" };
+					int[] values = { currentLevel };
+					Menu.saveGame(keys, values, 10);
+				}
+
 				restart = false;
 	
 				for (int i = 0; i < entities.size(); i++) {
@@ -299,11 +308,19 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			case KeyEvent.VK_BACK_SPACE: {
 				switch (state) {
 					case "NORMAL": {
-						menu.pause = true;
+						Menu.pause = true;
 						state = "MENU";
 						break;
 					}
 				}
+			}
+
+			case KeyEvent.VK_F1:
+			case KeyEvent.VK_F12: {
+				if (state == "NORMAL") {
+					saveGame = true;
+				}
+				break;
 			}
 		}
 		
