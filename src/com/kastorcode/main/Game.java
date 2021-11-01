@@ -2,6 +2,7 @@ package com.kastorcode.main;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -10,6 +11,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,7 +54,13 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public Menu menu;
 
 	public UI ui;
-	
+
+	/* public InputStream stream =
+		ClassLoader.getSystemClassLoader()
+		.getResourceAsStream("/fonts/pixel.ttf");
+
+	public Font newFont; */
+
 	public static String state = "MENU";
 	
 	public boolean saveGame = false;
@@ -75,6 +84,13 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
 
 		entities.add(player);
+
+		/* try {
+			newFont = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(21f);
+		}
+		catch (FontFormatException | IOException e) {
+			e.printStackTrace();
+		} */
 
 		world = new World("level1.png");
 		menu = new Menu();
@@ -209,7 +225,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		g = bs.getDrawGraphics();
 
 		g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
-		
+
 		switch (state) {
 			case "GAME_OVER": {
 				Graphics2D g2 = (Graphics2D)g;
