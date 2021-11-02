@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import com.kastorcode.graphics.UI;
 import com.kastorcode.world.World;
 
 
-public class Game extends Window implements Runnable, KeyListener, MouseListener {
+public class Game extends Window implements Runnable, KeyListener, MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 
 	private Thread thread;
@@ -55,15 +56,19 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 	public UI ui;
 
-	/* public InputStream stream =
+	/* Load custom fonts
+	public InputStream stream =
 		ClassLoader.getSystemClassLoader()
 		.getResourceAsStream("/fonts/pixel.ttf");
 
-	public Font newFont; */
+	public Font newFont;
+	*/
 
 	public static String state = "MENU";
 	
 	public boolean saveGame = false;
+	
+	public int mx, my;
 
 
 	public Game () {
@@ -73,6 +78,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 		addKeyListener(this);
 		addMouseListener(this);
+		addMouseMotionListener(this);
 
 		rand = new Random();
 		ui = new UI();
@@ -85,12 +91,14 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 		entities.add(player);
 
-		/* try {
+		/* Load custom fonts
+		try {
 			newFont = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(21f);
 		}
 		catch (FontFormatException | IOException e) {
 			e.printStackTrace();
-		} */
+		}
+		*/
 
 		world = new World("level1.png");
 		menu = new Menu();
@@ -250,6 +258,14 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 				break;
 			}
 		}
+		
+		/* Rotates objects based on mouse
+		Graphics2D g2 = (Graphics2D)g;
+		double mouseAngle = Math.atan2(225 - my, 225 - mx);
+		g2.rotate(mouseAngle, 225, 225);
+		g.setColor(Color.RED);
+		g.fillRect(200, 200, 50, 50);
+		*/
 
 		bs.show();
 	}
@@ -453,5 +469,18 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	@Override
 	public void mouseReleased (MouseEvent arg0) {
 		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void mouseDragged(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		mx = e.getX();
+		my = e.getY();
 	}
 }
