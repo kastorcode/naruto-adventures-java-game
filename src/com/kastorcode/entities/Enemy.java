@@ -22,7 +22,7 @@ public class Enemy extends Entity {
 		frameIndex = 0, maxFrameIndex = maxFrames - 1,
 		damageFrames = 0, life = 10;
 	
-	private boolean moved = false;
+	private boolean moved = false, pursue = false;
 	
 	public boolean isDamaged = false;
 	
@@ -59,79 +59,84 @@ public class Enemy extends Entity {
 	
 	public void tick () {
 		moved = false;
-		
-		if (isCollidingWithPlayer()) {
-			if (Game.rand.nextInt(100) < 10) {
-				Sound.HURT_EFFECT.play();
-				Game.player.isDamaged = true;
-				Game.player.life -= Game.rand.nextInt(3);
-			}
-		}
-		else if (Game.rand.nextInt(100) < 75) {
-			if (x < Game.player.getX() &&
-				World.isFree((int)(x + speed), getY(), 0) &&
-				!isColliding((int)(x + speed), getY())
-			) {
-				moved = true;
-				direction = rightDirection;
-				x += speed;
-			}
-			else if (x > Game.player.getX() &&
-				World.isFree((int)(x - speed), getY(), 0) &&
-				!isColliding((int)(x - speed), getY())
-			) {
-				moved = true;
-				direction = leftDirection;
-				x -= speed;
-			}
-	
-			if (y < Game.player.getY() &&
-				World.isFree(getX(), (int)(y + speed), 0) &&
-				!isColliding(getX(), (int)(y + speed))
-			) {
-				moved = true;
-				y += speed;
-			}
-			else if (y > Game.player.getY() &&
-				World.isFree(getX(), (int)(y - speed), 0) &&
-				!isColliding(getX(), (int)(y - speed))
-			) {
-				moved = true;
-				y -= speed;
-			}
 
-			if (moved) {
-				frames++;
-				
-				if (frames == maxFrames) {
-					frames = 0;
-					frameIndex++;
+		if (pursue) {
+			if (isCollidingWithPlayer()) {
+				if (Game.rand.nextInt(100) < 10) {
+					Sound.HURT_EFFECT.play();
+					Game.player.isDamaged = true;
+					Game.player.life -= Game.rand.nextInt(3);
+				}
+			}
+			else if (Game.rand.nextInt(100) < 75) {
+				if (x < Game.player.getX() &&
+					World.isFree((int)(x + speed), getY(), 0) &&
+					!isColliding((int)(x + speed), getY())
+				) {
+					moved = true;
+					direction = rightDirection;
+					x += speed;
+				}
+				else if (x > Game.player.getX() &&
+					World.isFree((int)(x - speed), getY(), 0) &&
+					!isColliding((int)(x - speed), getY())
+				) {
+					moved = true;
+					direction = leftDirection;
+					x -= speed;
+				}
+		
+				if (y < Game.player.getY() &&
+					World.isFree(getX(), (int)(y + speed), 0) &&
+					!isColliding(getX(), (int)(y + speed))
+				) {
+					moved = true;
+					y += speed;
+				}
+				else if (y > Game.player.getY() &&
+					World.isFree(getX(), (int)(y - speed), 0) &&
+					!isColliding(getX(), (int)(y - speed))
+				) {
+					moved = true;
+					y -= speed;
+				}
+	
+				if (moved) {
+					frames++;
 					
-					if (frameIndex > maxFrameIndex) {
-						frameIndex = 0;
+					if (frames == maxFrames) {
+						frames = 0;
+						frameIndex++;
+						
+						if (frameIndex > maxFrameIndex) {
+							frameIndex = 0;
+						}
+					}
+				}
+				else {
+					frameIndex = 0;
+					frames = 0;
+				}
+	
+				isCollidingWithBullet();
+				
+				if (life < 1) {
+					destroySelf();
+					return;
+				}
+				
+				if (isDamaged) {
+					damageFrames++;
+					
+					if (damageFrames == 8) {
+						damageFrames = 0;
+						isDamaged = false;
 					}
 				}
 			}
-			else {
-				frameIndex = 0;
-				frames = 0;
-			}
-
-			isCollidingWithBullet();
-			
-			if (life < 1) {
-				destroySelf();
-				return;
-			}
-			
-			if (isDamaged) {
-				damageFrames++;
-				
-				if (damageFrames == 8) {
-					damageFrames = 0;
-					isDamaged = false;
-				}
-			}
+		}
+		else if (calculateDistance(getX(), getY(), Game.player.getX(), Game.player.getY()) < 64) {
+			pursue = true;
 		}
 	}
 	

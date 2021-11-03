@@ -12,8 +12,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import com.kastorcode.world.World;
-
 
 public class Menu {
 	public String[] options = {
