@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -65,7 +66,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	
 	public boolean saveGame = false;
 	
+	public int[] pixels;
+	
 	public int mx, my;
+
+	// public int x, y;
 
 
 	public Game () {
@@ -80,6 +85,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		rand = new Random();
 		ui = new UI();
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+		pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
 		bullets = new ArrayList<BulletShoot>();
@@ -130,6 +136,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public void tick () {
 		switch (state) {
 			case "NORMAL": {
+				// x++;
+
 				if (saveGame) {
 					saveGame = false;
 					String[] keys = { "level" };
@@ -197,6 +205,24 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		world = new World("/" + level);
 		return;
 	}
+	
+	
+	/*
+	public void drawRectangleExample (int xOff, int yOff) {
+		for (int x = 0; x < 32; x++) {
+			for (int y = 0; y < 32; y++) {
+				int xOffset = x + xOff;
+				int yOffset = y + yOff;
+				
+				if (xOffset < 0 || yOffset < 0 || xOffset > WIDTH || yOffset > HEIGHT) {
+					continue;
+				}
+
+				pixels[xOffset + (yOffset * WIDTH)] = 0xff0000;
+			}
+		}
+	}
+	*/
 
 
 	public void render () {
@@ -228,6 +254,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		g.dispose();
 
 		g = bs.getDrawGraphics();
+		
+		// drawRectangleExample(x, y);
 
 		g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
 
