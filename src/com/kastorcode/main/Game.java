@@ -12,9 +12,12 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import com.kastorcode.entities.BulletShoot;
 import com.kastorcode.entities.Enemy;
@@ -66,7 +69,9 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	
 	public boolean saveGame = false;
 	
-	public int[] pixels;
+	public int[] pixels, mapLightPixels;
+	
+	public BufferedImage mapLight;
 	
 	public int mx, my;
 
@@ -85,6 +90,19 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		rand = new Random();
 		ui = new UI();
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+
+		try {
+			mapLight = ImageIO.read(getClass().getResource("/images/maplight.png"));
+			mapLightPixels = new int[mapLight.getWidth() * mapLight.getHeight()];
+			mapLight.getRGB(
+				0, 0, mapLight.getWidth(), mapLight.getHeight(),
+				mapLightPixels, 0, mapLight.getWidth()
+			);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
@@ -225,6 +243,17 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	*/
 
 
+	public void applyLight () {
+		for (int x = 0; x < WIDTH; x++) {
+			for (int y = 0; y < HEIGHT; y++) {
+				if (mapLightPixels[x + (y * WIDTH)] == 0xffffffff) {
+					pixels[x + (y * WIDTH)] = 0;
+				}
+			}
+		}
+	}
+
+
 	public void render () {
 		BufferStrategy bs = this.getBufferStrategy();
 		
@@ -248,6 +277,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		for (int i = 0; i < bullets.size(); i++) {
 			bullets.get(i).render(g);
 		}
+		
+		applyLight();
 
 		ui.render(g);
 
