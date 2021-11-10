@@ -3,10 +3,14 @@ package com.kastorcode.entities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import com.kastorcode.graphics.Spritesheet;
+import com.kastorcode.main.Game;
 import com.kastorcode.world.Camera;
+import com.kastorcode.world.Node;
 import com.kastorcode.world.Tile;
+import com.kastorcode.world.Vector2i;
 
 
 public class Entity {
@@ -21,6 +25,8 @@ public class Entity {
 	protected double x, y, z;
 
 	protected int width, height;
+	
+	protected List<Node> path;
 	
 	private BufferedImage sprite;
 	
@@ -76,6 +82,55 @@ public class Entity {
 	
 	public double calculateDistance (int x1, int y1, int x2, int y2) {
 		return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+	}
+
+
+	public boolean isColliding (int nextX, int nextY) {
+		Rectangle currentEnemy = new Rectangle(nextX, nextY, Tile.TILE_SIZE, Tile.TILE_SIZE);
+		int enemiesSize = Game.enemies.size();
+		
+		for (int i = 0; i < enemiesSize; i++) {
+			Enemy enemy = Game.enemies.get(i);
+			
+			if (enemy == this) { continue; }
+			
+			Rectangle targetEnemy = new Rectangle(enemy.getX(), enemy.getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
+			
+			if (currentEnemy.intersects(targetEnemy)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	public void followPath (List<Node> path) {
+		if (path != null) {
+			if (path.size() > 0) {
+				Vector2i target = path.get(path.size() - 1).tile;
+				//xprev = x;
+				//yprev = y;
+
+				if (x < target.x * 16 && !isColliding(getX() + 1, getY())) {
+					x++;
+				}
+				else if (x > target.x * 16 && !isColliding(getX() - 1, getY())) {
+					x--;
+				}
+
+				if (y < target.y * 16 && !isColliding(getX(), getY() + 1)) {
+					y++;
+				}
+				else if (y > target.y * 16 && !isColliding(getX(), getY() - 1)) {
+					y--;
+				}
+
+				if (x == target.x * 16 && y == target.y * 16) {
+					path.remove(path.size() - 1);
+				}
+			}
+		}
 	}
 	
 	

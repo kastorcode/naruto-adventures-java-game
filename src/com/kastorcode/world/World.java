@@ -77,6 +77,18 @@ public class World {
 							Game.entities.add(new Bullet(xx * 16, yy * 16, 16, 16, Entity.BULLET));
 							break;
 						}
+						
+						// Flower
+						case 0xFF4CFF00: {
+							tiles[xx + (yy * WIDTH)] = new FlowerTile(xx * 16, yy * 16, Tile.TILE_FLOWER);
+							break;
+						}
+
+						// Ground
+						case 0xFF964b00: {
+							tiles[xx + (yy * WIDTH)] = new GroundTile(xx * 16, yy * 16, Tile.TILE_GROUND);
+							break;
+						}
 					}
 				}
 			}

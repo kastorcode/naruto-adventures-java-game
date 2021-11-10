@@ -7,8 +7,10 @@ import java.awt.Rectangle;
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.main.Game;
 import com.kastorcode.main.Sound;
+import com.kastorcode.world.AStar;
 import com.kastorcode.world.Camera;
 import com.kastorcode.world.Tile;
+import com.kastorcode.world.Vector2i;
 import com.kastorcode.world.World;
 
 
@@ -57,6 +59,7 @@ public class Enemy extends Entity {
 	}
 	
 	
+	/*
 	public void tick () {
 		moved = false;
 
@@ -139,8 +142,79 @@ public class Enemy extends Entity {
 			pursue = true;
 		}
 	}
+	*/
 	
 	
+	public void tick () {
+		moved = false;
+
+		if (pursue) {
+			moved = true;
+
+			if (moved) {
+				if (!isCollidingWithPlayer()) {
+					if (path == null || path.size() == 0) {
+						Vector2i start = new Vector2i((int)(x / 16), (int)(y / 16));
+						Vector2i end = new Vector2i((int)(Game.player.x / 16), (int)(Game.player.y / 16));
+						path = AStar.findPath(Game.world, start, end);
+					}
+				}
+				else {
+					if (Game.rand.nextInt(100) < 10) {
+						Sound.HURT_EFFECT.play();
+						Game.player.isDamaged = true;
+						Game.player.life -= Game.rand.nextInt(3);
+					}
+				}
+
+				if (Game.rand.nextInt(100) < 75) {
+					followPath(path);
+				}
+				
+				if (Game.rand.nextInt(100) < 5) {
+					Vector2i start = new Vector2i((int)(x / 16), (int)(y / 16));
+					Vector2i end = new Vector2i((int)(Game.player.x / 16), (int)(Game.player.y / 16));
+					path = AStar.findPath(Game.world, start, end);
+				}
+
+				frames++;
+				
+				if (frames == maxFrames) {
+					frames = 0;
+					frameIndex++;
+					
+					if (frameIndex > maxFrameIndex) {
+						frameIndex = 0;
+					}
+				}
+			}
+			else {
+				frameIndex = 0;
+				frames = 0;
+			}
+		
+			isCollidingWithBullet();
+					
+			if (life < 1) {
+				destroySelf();
+				return;
+			}
+	
+			if (isDamaged) {
+				damageFrames++;
+	
+				if (damageFrames == 8) {
+					damageFrames = 0;
+					isDamaged = false;
+				}
+			}
+		}
+		else if (calculateDistance(getX(), getY(), Game.player.getX(), Game.player.getY()) < 64) {
+			pursue = true;
+		}
+	}
+
+
 	public void destroySelf () {
 		Game.enemies.remove(this);
 		Game.entities.remove(this);
@@ -176,28 +250,8 @@ public class Enemy extends Entity {
 
 		return false;
 	}
-	
-	
-	public boolean isColliding (int nextX, int nextY) {
-		Rectangle currentEnemy = new Rectangle(nextX, nextY, Tile.TILE_SIZE, Tile.TILE_SIZE);
-		int enemiesSize = Game.enemies.size();
-		
-		for (int i = 0; i < enemiesSize; i++) {
-			Enemy enemy = Game.enemies.get(i);
-			
-			if (enemy == this) { continue; }
-			
-			Rectangle targetEnemy = new Rectangle(enemy.getX(), enemy.getY(), Tile.TILE_SIZE, Tile.TILE_SIZE);
-			
-			if (currentEnemy.intersects(targetEnemy)) {
-				return true;
-			}
-		}
 
-		return false;
-	}
-	
-	
+
 	public void render (Graphics g) {
 		if (isDamaged) {
 			if (direction == rightDirection) {

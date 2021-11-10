@@ -205,6 +205,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			}
 			
 			case "MENU": {
+				player.updateCamera();
 				menu.tick();
 				break;
 			}
