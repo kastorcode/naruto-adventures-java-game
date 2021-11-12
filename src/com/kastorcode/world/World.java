@@ -18,7 +18,8 @@ public class World {
 	public static Tile[] tiles;
 
 
-	public World (String name) {
+	// Normal constructor
+	/* public World (String name) {
 		try {
 			BufferedImage map = ImageIO.read(getClass().getResource("/images/" + name));
 			WIDTH = map.getWidth();
@@ -95,6 +96,63 @@ public class World {
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+		}
+	} */
+
+
+	// Random constructor
+	public World (String name) {
+		Game.player.setX(0);
+		Game.player.setY(0);
+		WIDTH = 100;
+		HEIGHT = 100;
+		tiles = new Tile[WIDTH * HEIGHT];
+
+		for (int x = 0; x < WIDTH; x++) {
+			for (int y = 0; y < HEIGHT; y++) {
+				tiles[x + y * WIDTH] = new WallTile(x * 16, y * 16, Tile.TILE_WALL);
+			}
+		}
+
+		int direction = 0, x = 0, y = 0;
+
+		for (int i = 0; i < 200; i++) {
+			tiles[x + y * WIDTH] = new FloorTile(x * 16, y * 16, Tile.TILE_FLOOR);
+
+			switch (direction) {
+				case 0: {
+					// Right
+					if (x < WIDTH) {
+						x++;
+					}
+					break;
+				}
+				case 1: {
+					// Left
+					if (x > 0) {
+						x--;
+					}
+					break;
+				}
+				case 2: {
+					// Down
+					if (y < HEIGHT) {
+						y++;
+					}
+					break;
+				}
+				case 3: {
+					// Up
+					if (y > 0) {
+						y--;
+					}
+					break;
+				}
+			}
+
+			if (Game.rand.nextInt(100) < 30) {
+				direction = Game.rand.nextInt(4);
+			}
 		}
 	}
 	

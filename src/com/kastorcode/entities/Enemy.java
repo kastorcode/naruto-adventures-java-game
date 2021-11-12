@@ -57,10 +57,10 @@ public class Enemy extends Entity {
 			damageLeftEnemy[i] = Spritesheet.getSprite(80 + (i * 16), 64, 16, 16);
 		}
 	}
-	
-	
-	/*
-	public void tick () {
+
+
+	// Logic without the AStar algorithm
+	/* public void tick () {
 		moved = false;
 
 		if (pursue) {
@@ -141,10 +141,10 @@ public class Enemy extends Entity {
 		else if (calculateDistance(getX(), getY(), Game.player.getX(), Game.player.getY()) < 64) {
 			pursue = true;
 		}
-	}
-	*/
-	
-	
+	} */
+
+
+	// Logic with the AStar algorithm
 	public void tick () {
 		depth = 0;
 		moved = false;
