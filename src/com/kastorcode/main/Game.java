@@ -38,6 +38,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 	private BufferedImage image;
 	
+	public static BufferedImage minimap;
+	
 	private int currentLevel = 1, maxLevel = 2, framesGameOverMessage = 0;
 	
 	public static List<Entity> entities;
@@ -71,6 +73,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public boolean saveGame = false;
 	
 	public int[] pixels, mapLightPixels;
+	
+	public static int[] minimapPixels;
 	
 	public BufferedImage mapLight;
 	
@@ -123,6 +127,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		*/
 
 		world = new World("level1.png");
+		minimap = new BufferedImage(World.WIDTH, World.HEIGHT, BufferedImage.TYPE_INT_RGB);
+		minimapPixels = ((DataBufferInt)minimap.getRaster().getDataBuffer()).getData();
 		menu = new Menu();
 	}
 
@@ -281,7 +287,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			bullets.get(i).render(g);
 		}
 		
-		applyLight();
+		// applyLight();
 
 		ui.render(g);
 
@@ -326,6 +332,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		g.fillRect(200, 200, 50, 50);
 		*/
 
+		World.renderMinimap();
+		g.drawImage(minimap, 618, 70, World.WIDTH * 5, World.HEIGHT * 5, null);
 		bs.show();
 	}
 

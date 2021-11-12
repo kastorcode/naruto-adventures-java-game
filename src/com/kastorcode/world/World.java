@@ -129,6 +129,25 @@ public class World {
 	}
 	
 	
+	public static void renderMinimap () {
+		for (int i = 0; i < Game.minimapPixels.length; i++) {
+			Game.minimapPixels[i] = 0;
+		}
+		
+		for (int x = 0; x < WIDTH; x++) {
+			for (int y = 0; y < HEIGHT; y++) {
+				if (tiles[x + (y * WIDTH)] instanceof WallTile) {
+					Game.minimapPixels[x + (y * WIDTH)] = 0xffffffff;
+				}
+			}
+		}
+		
+		int playerX = Game.player.getX() / 16;
+		int playerY = Game.player.getY() / 16;
+		Game.minimapPixels[playerX + (playerY * WIDTH)] = 0xffffA500;
+	}
+	
+	
 	public void render (Graphics g) {
 		int xStart = Camera.getX() >> 4;
 		int yStart = Camera.getY() >> 4;
