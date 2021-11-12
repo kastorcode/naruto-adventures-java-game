@@ -3,6 +3,7 @@ package com.kastorcode.entities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Comparator;
 import java.util.List;
 
 import com.kastorcode.graphics.Spritesheet;
@@ -29,6 +30,8 @@ public class Entity {
 	protected List<Node> path;
 	
 	private BufferedImage sprite;
+	
+	public int depth;
 	
 
 	public Entity (double x, double y, int width, int height, BufferedImage sprite) {
@@ -132,8 +135,25 @@ public class Entity {
 			}
 		}
 	}
-	
-	
+
+
+	public static Comparator<Entity> nodeSorter = new Comparator<Entity>() {
+		@Override
+
+		public int compare (Entity e0, Entity e1) {
+			if (e1.depth < e0.depth) {
+				return + 1;
+			}
+
+			if (e1.depth > e0.depth) {
+				return - 1;
+			}
+
+			return 0;
+		}
+	};
+
+
 	public void render (Graphics g) {
 		g.drawImage(sprite, getX() - Camera.getX(), getY() - Camera.getY(), null);
 	}

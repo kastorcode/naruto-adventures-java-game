@@ -146,6 +146,7 @@ public class Enemy extends Entity {
 	
 	
 	public void tick () {
+		depth = 0;
 		moved = false;
 
 		if (pursue) {
