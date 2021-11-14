@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -298,7 +299,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		
 		// drawRectangleExample(x, y);
 
-		g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
+		g.drawImage(image, 0, 0, Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height, null);
 
 		switch (state) {
 			case "GAME_OVER": {
@@ -346,8 +347,6 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		double delta = 0;
 		int frames = 0;
 		double timer = System.currentTimeMillis();
-
-		requestFocus();
 
 		while (isRunning) {
 			long now = System.nanoTime();

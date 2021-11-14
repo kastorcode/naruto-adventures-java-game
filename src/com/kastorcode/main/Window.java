@@ -21,10 +21,12 @@ public class Window extends Canvas {
 
 	
 	public Window () {
-		setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+		//setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+		setPreferredSize(new Dimension(Toolkit.getDefaultToolkit().getScreenSize()));
 
 		frame = new JFrame("Game #1");
 		frame.add(this);
+		frame.setUndecorated(true);
 		frame.setResizable(false);
 		frame.pack();
 		
@@ -47,5 +49,6 @@ public class Window extends Canvas {
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
+		requestFocus();
 	}
 }
