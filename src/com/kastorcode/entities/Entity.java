@@ -3,6 +3,7 @@ package com.kastorcode.entities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.util.Comparator;
 import java.util.List;
 
@@ -101,6 +102,30 @@ public class Entity {
 			
 			if (currentEnemy.intersects(targetEnemy)) {
 				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	public boolean pixelPerfectIsColliding (int x1, int y1, int x2, int y2, int[] pixels1, int[] pixels2, BufferedImage sprite1, BufferedImage sprite2) {
+		for (int xx1 = 0; xx1 < sprite1.getWidth(); xx1++) {
+			for (int yy1 = 0; yy1 < sprite1.getHeight(); yy1++) {
+				for (int xx2 = 0; xx2 < sprite2.getWidth(); xx2++) {
+					for (int yy2 = 0; yy2 < sprite2.getHeight(); yy2++) {
+						int currentPixel1 = pixels1[xx1 + yy1 * sprite1.getWidth()];
+						int currentPixel2 = pixels2[xx2 + yy2 * sprite2.getWidth()];
+
+						if (currentPixel1 == 0x00ffffff || currentPixel2 == 0x00ffffff) {
+							continue;
+						}
+
+						if (xx1 + x1 == xx2 + x2 && yy1 + y1 == yy2 + y2) {
+							return true;
+						}
+					}
+				}
 			}
 		}
 
