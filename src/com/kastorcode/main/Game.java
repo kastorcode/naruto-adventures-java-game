@@ -76,7 +76,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public int[] pixels, mapLightPixels;
 	
 	public static int[] minimapPixels;
-	
+
+	public static int entry = 1, begin = 2, playing = 3, sceneState = entry;
+
+	public int sceneTime = 0, sceneMaxTime = 60 * 3;
+
 	public BufferedImage mapLight;
 	
 	public int mx, my;
@@ -174,15 +178,32 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 				restart = false;
 	
-				for (int i = 0; i < entities.size(); i++) {
-					Entity entity = entities.get(i);
-					entity.tick();
+				if (sceneState == playing) {
+					for (int i = 0; i < entities.size(); i++) {
+						Entity entity = entities.get(i);
+						entity.tick();
+					}
+					
+					for (int i = 0; i < bullets.size(); i++) {
+						bullets.get(i).tick();
+					}
 				}
-				
-				for (int i = 0; i < bullets.size(); i++) {
-					bullets.get(i).tick();
+				else if (sceneState == begin) {
+					sceneTime++;
+
+					if (sceneTime == sceneMaxTime) {
+						sceneState = playing;
+					}
 				}
-				
+				else if (sceneState == entry) {
+					if (player.getX() < 100) {
+						player.x++;
+					}
+					else {
+						sceneState = begin;
+					}
+				}
+
 				if (enemies.size() == 0) {
 					currentLevel++;
 					
@@ -336,6 +357,13 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 		World.renderMinimap();
 		g.drawImage(minimap, 618, 70, World.WIDTH * 5, World.HEIGHT * 5, null);
+
+		if (sceneState == begin) {
+			g.setFont(new Font("arial", Font.BOLD, 32));
+			g.setColor(Color.WHITE);
+			g.drawString("Prepare-se... O jogo vai começar!", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2);
+		}
+
 		bs.show();
 	}
 

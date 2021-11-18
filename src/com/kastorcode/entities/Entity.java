@@ -24,7 +24,7 @@ public class Entity {
 		PLAYER_WEAPON = Spritesheet.getSprite(5 * 16, 0, 16, 16),
 		DAMAGED_PLAYER_WEAPON = Spritesheet.getSprite(6 * 16, 0, 16, 16);
 
-	protected double x, y, z;
+	public double x, y, z;
 
 	protected int width, height;
 	

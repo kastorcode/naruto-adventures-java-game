@@ -19,7 +19,7 @@ public class World {
 
 
 	// Normal constructor
-	/* public World (String name) {
+	public World (String name) {
 		try {
 			BufferedImage map = ImageIO.read(getClass().getResource("/images/" + name));
 			WIDTH = map.getWidth();
@@ -97,11 +97,11 @@ public class World {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-	} */
+	}
 
 
 	// Random constructor
-	public World (String name) {
+	/* public World (String name) {
 		Game.player.setX(0);
 		Game.player.setY(0);
 		WIDTH = 100;
@@ -154,9 +154,9 @@ public class World {
 				direction = Game.rand.nextInt(4);
 			}
 		}
-	}
-	
-	
+	} */
+
+
 	public static boolean isFree (int nextX, int nextY, int zPlayer) {
 		int x1 = nextX / Tile.TILE_SIZE;
 		int y1 = nextY / Tile.TILE_SIZE;
