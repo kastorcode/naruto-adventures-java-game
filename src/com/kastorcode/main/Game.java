@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 import com.kastorcode.entities.BulletShoot;
 import com.kastorcode.entities.Enemy;
 import com.kastorcode.entities.Entity;
+import com.kastorcode.entities.Npc;
 import com.kastorcode.entities.Player;
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.graphics.UI;
@@ -86,6 +87,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	public int mx, my;
 
 	// public int x, y;
+	
+	public Npc sasukeNpc;
 
 
 	public Game () {
@@ -120,8 +123,10 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		bullets = new ArrayList<BulletShoot>();
 		spritesheet = new Spritesheet("spritesheet.png");
 		player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
+		sasukeNpc = new Npc(32, 32, 16, 16, Spritesheet.getSprite(0, 9 * 16, 16, 16));
 
 		entities.add(player);
+		entities.add(sasukeNpc);
 
 		/* Load custom fonts
 		try {
