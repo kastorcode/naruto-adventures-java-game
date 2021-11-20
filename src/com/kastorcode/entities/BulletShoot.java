@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 import com.kastorcode.main.Game;
 import com.kastorcode.world.Camera;
+import com.kastorcode.world.World;
 
 
 public class BulletShoot extends Entity {
@@ -25,8 +26,15 @@ public class BulletShoot extends Entity {
 	
 	
 	public void tick () {
-		x += dx * speed;
-		y += dy * speed;
+		if (World.isFreeDynamic((int)(x + (dx * speed)), (int)(y + (dy * speed)), 16, 16)) {
+			x += dx * speed;
+			y += dy * speed;
+		}
+		else {
+			Game.bullets.remove(this);
+			return;
+		}
+
 		currentLife++;
 		
 		if (currentLife == life) {

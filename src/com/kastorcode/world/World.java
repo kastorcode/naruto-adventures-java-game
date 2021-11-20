@@ -185,6 +185,28 @@ public class World {
 		
 		return false;
 	}
+
+
+	public static boolean isFreeDynamic (int nextX, int nextY, int width, int height) {
+		int x1 = nextX / Tile.TILE_SIZE;
+		int y1 = nextY / Tile.TILE_SIZE;
+
+		int x2 = (nextX + width - 1) / Tile.TILE_SIZE;
+		int y2 = nextY / Tile.TILE_SIZE;
+
+		int x3 = nextX / Tile.TILE_SIZE;
+		int y3 = (nextY + height - 1) / Tile.TILE_SIZE;
+
+		int x4 = (nextX + width - 1) / Tile.TILE_SIZE;
+		int y4 = (nextY + height - 1) / Tile.TILE_SIZE;
+
+		return !(
+			tiles[x1 + (y1 * World.WIDTH)] instanceof WallTile ||
+			tiles[x2 + (y2 * World.WIDTH)] instanceof WallTile ||
+			tiles[x3 + (y3 * World.WIDTH)] instanceof WallTile ||
+			tiles[x4 + (y4 * World.WIDTH)] instanceof WallTile
+		);
+	}
 	
 	
 	public static void renderMinimap () {
