@@ -3,40 +3,141 @@ package com.kastorcode.entities;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.main.Game;
+import com.kastorcode.main.NewerSound;
 import com.kastorcode.main.Window;
 import com.kastorcode.world.Camera;
 import com.kastorcode.world.World;
 
 
 public class Player extends Entity {
-	public boolean right, left, up, down, isDamaged = false,
-		shoot = false, mouseShoot = false, jump = false,
-		isJumping = false, jumpUp = false, jumpDown = false;
-	
-	public int rightDirection = 0, leftDirection = 1,
-		direction = rightDirection, munition = 10000 /*0*/,
-		mx, my, z = 0, jumpFrames = 50, jumpCurrentFrame = 0,
-		jumpSpeed = 1;
+	public final double
+		SPEED = 1.0, MAX_SPEED = 2.0;
 
-	public double speed = 1.4, life = 10000 /*100*/, maxLife = 100;
+	public final int MAX_LIFE = 100;
+
+	public boolean
+		right, left, up, down, isDamaged = false,
+		hasWeapon = false, shoot = false, mouseShoot = false,
+		jump = false, isJumping = false, jumpUp = false,
+		jumpDown = false;
+
+	public int life = MAX_LIFE, rightDirection = 0,
+		leftDirection = 1, direction = rightDirection,
+		munition = 0, points = 0, mx, my, z = 0,
+		jumpSpeed = 2, jumpFrames = 32, jumpCurrentFrame = 0;
+
+	public double speed;
 
 	private int frames = 0, maxFrames = 5,
 		frameIndex = 0, maxFrameIndex = maxFrames - 1,
 		damageFrames = 0;
 
-	private boolean moved = false, hasWeapon = false;
+	private boolean moved = false;
 
 	public BufferedImage[] damageRightPlayer, damageLeftPlayer;
 
 	private BufferedImage[] rightPlayer, leftPlayer;
 
+	private static final NewerSound runningSound = new NewerSound("/effects/running.wav");
+	private static final NewerSound jumpingSound = new NewerSound("/effects/jumping.wav");
+
 
 	public Player(int x, int y, int width, int height, BufferedImage sprite) {
 		super(x, y, width, height, sprite);
 		
+		if (Game.currentLevel > 1 && Game.player != null) {
+			life = Game.player.life;
+			munition = Game.player.munition;
+			points = Game.player.points;
+		}
+
+		switch (Game.currentLevel) {
+			case 1: {
+				speed = SPEED;
+				break;
+			}
+			case 2: {
+				speed = SPEED + 0.10;
+				break;
+			}
+			case 3: {
+				speed = SPEED + 0.15;
+				break;
+			}
+			case 4: {
+				speed = SPEED + 0.20;
+				break;
+			}
+			case 5: {
+				speed = SPEED + 0.25;
+				break;
+			}
+			case 6: {
+				speed = SPEED + 0.30;
+				break;
+			}
+			case 7: {
+				speed = SPEED + 0.35;
+				break;
+			}
+			case 8: {
+				speed = SPEED + 0.40;
+				break;
+			}
+			case 9: {
+				speed = SPEED + 0.45;
+				break;
+			}
+			case 10: {
+				speed = SPEED + 0.50;
+				break;
+			}
+			case 11: {
+				speed = SPEED + 0.55;
+				break;
+			}
+			case 12: {
+				speed = SPEED + 0.60;
+				break;
+			}
+			case 13: {
+				speed = SPEED + 0.65;
+				break;
+			}
+			case 14: {
+				speed = SPEED + 0.70;
+				break;
+			}
+			case 15: {
+				speed = SPEED + 0.75;
+				break;
+			}
+			case 16: {
+				speed = SPEED + 0.80;
+				break;
+			}
+			case 17: {
+				speed = SPEED + 0.85;
+				break;
+			}
+			case 18: {
+				speed = SPEED + 0.90;
+				break;
+			}
+			case 19: {
+				speed = SPEED + 0.95;
+				break;
+			}
+			case 20: {
+				speed = MAX_SPEED;
+				break;
+			}
+		}
+
 		rightPlayer = new BufferedImage[maxFrames];
 		leftPlayer = new BufferedImage[maxFrames];
 		damageRightPlayer = new BufferedImage[maxFrames];
@@ -67,8 +168,8 @@ public class Player extends Entity {
 			if (entity instanceof Weapon) {
 				if (Entity.isColliding(this, entity)) {
 					hasWeapon = true;
+					Game.player.munition++;
 					Game.entities.remove(i);
-
 					return;
 				}
 			}
@@ -82,9 +183,10 @@ public class Player extends Entity {
 			
 			if (entity instanceof Bullet) {
 				if (Entity.isColliding(this, entity)) {
-					munition += 10;
+					Game.player.munition += new Random().nextInt(
+						Enemy.LIFE * 4 - Enemy.LIFE * 3) +
+						Enemy.LIFE * 3;
 					Game.entities.remove(i);
-
 					return;
 				}
 			}
@@ -98,12 +200,10 @@ public class Player extends Entity {
 			
 			if (entity instanceof LifePack) {
 				if (Entity.isColliding(this, entity)) {
-					life += 8;
-					
-					if (life > 100) { life = 100; }
-					
 					Game.entities.remove(i);
-
+					life += new Random().nextInt(
+						Enemy.LIFE * 3 - Enemy.LIFE * 2) +
+						Enemy.LIFE * 2;
 					return;
 				}
 			}
@@ -114,14 +214,24 @@ public class Player extends Entity {
 	public void tick () {
 		depth = 1;
 
-		if (jump) {
-			if (isJumping == false) {
+		if (jump && isJumping == false) {
+			if (life > 1 || Game.rand.nextInt(100) < 33) {
+				runningSound.stop();
+				jumpingSound.stop();
+				jumpingSound.play();
 				jump = false;
 				isJumping = true;
 				jumpUp = true;
+
+				if (life > 1) {
+					life -= Game.rand.nextInt(2);
+				}
+			}
+			else {
+				jump = false;
 			}
 		}
-		
+
 		if (isJumping) {
 			if (jumpUp) {
 				jumpCurrentFrame += jumpSpeed;
@@ -166,18 +276,23 @@ public class Player extends Entity {
 		}
 		
 		if (moved) {
+			if (z == 0 && frames == 4) {
+				runningSound.loop();
+			}
+
 			frames++;
-			
+
 			if (frames == maxFrames) {
 				frames = 0;
 				frameIndex++;
-				
+
 				if (frameIndex > maxFrameIndex) {
 					frameIndex = 0;
 				}
 			}
 		}
 		else {
+			runningSound.stop();
 			frameIndex = 0;
 			frames = 0;
 		}

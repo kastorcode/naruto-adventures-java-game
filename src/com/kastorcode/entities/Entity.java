@@ -3,7 +3,6 @@ package com.kastorcode.entities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,7 +21,8 @@ public class Entity {
 		BULLET = Spritesheet.getSprite(64, 0, 16, 16),
 		ENEMY = Spritesheet.getSprite(2 * 16, 2 * 16, 16, 16),
 		PLAYER_WEAPON = Spritesheet.getSprite(5 * 16, 0, 16, 16),
-		DAMAGED_PLAYER_WEAPON = Spritesheet.getSprite(6 * 16, 0, 16, 16);
+		DAMAGED_PLAYER_WEAPON = Spritesheet.getSprite(6 * 16, 0, 16, 16),
+		HURLED_WEAPON = Spritesheet.getSprite(9 * 16, 0, 16, 16);
 
 	public double x, y, z;
 
@@ -133,7 +133,7 @@ public class Entity {
 	}
 
 
-	public void followPath (List<Node> path) {
+	public void followPath (List<Node> path, double speed) {
 		if (path != null) {
 			if (path.size() > 0) {
 				Vector2i target = path.get(path.size() - 1).tile;
@@ -141,17 +141,17 @@ public class Entity {
 				//yprev = y;
 
 				if (x < target.x * 16 && !isColliding(getX() + 1, getY())) {
-					x++;
+					x += speed;
 				}
 				else if (x > target.x * 16 && !isColliding(getX() - 1, getY())) {
-					x--;
+					x -= speed;
 				}
 
 				if (y < target.y * 16 && !isColliding(getX(), getY() + 1)) {
-					y++;
+					y += speed;
 				}
 				else if (y > target.y * 16 && !isColliding(getX(), getY() - 1)) {
-					y--;
+					y -= speed;
 				}
 
 				if (x == target.x * 16 && y == target.y * 16) {

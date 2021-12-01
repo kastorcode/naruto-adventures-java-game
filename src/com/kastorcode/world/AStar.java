@@ -87,9 +87,14 @@ public class AStar {
 				int y = current.tile.y;
 				int xi = (i % 3) - 1;
 				int yi = (i / 3) - 1;
-				
-				Tile tile = World.tiles[x + xi + ((y + yi) * World.WIDTH)];
-				
+
+				Tile tile = null;
+
+				try {
+					tile = World.tiles[x + xi + ((y + yi) * World.WIDTH)];
+				}
+				catch (ArrayIndexOutOfBoundsException error) {}
+
 				if (tile == null || tile instanceof WallTile) {
 					continue;
 				}

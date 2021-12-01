@@ -1,0 +1,26 @@
+LEVEL | ENEMIES | LÁMENS | KUNAIS | PERGAMINHOS | NPC'S | CHÃO/PAREDES
+1  | 4  | 1 | 1 | 2  | 0 | Grama/Tronco
+2  | 8  | 1 | 1 | 4  | 0 | Grama,Flor/Tronco
+3  | 12 | 1 | 1 | 6  | 0 | Grama Escura,Flor/Tronco
+4  | 16 | 1 | 1 | 8  | 0 | Terra,Flor/Tronco
+5  | 20 | 2 | 1 | 10 | 0 | Areia/Tronco
+6  | 24 | 2 | 1 | 12 | 0 | Grama/Pedra
+7  | 28 | 2 | 1 | 14 | 0 | Grama Escura,Flor/Pedra
+8  | 32 | 2 | 1 | 16 | 0 | Terra,Flor/Pedra
+9  | 36 | 3 | 2 | 18 | 0 | Areia/Pedra
+10 | 40 | 3 | 2 | 20 | 1 | Grama,Flor/Cimento
+11 | 44 | 3 | 2 | 22 | 1 | Grama Escura/Cimento
+12 | 48 | 3 | 2 | 24 | 1 | Terra/Cimento
+13 | 52 | 4 | 2 | 26 | 2 | Areia/Cimento
+14 | 56 | 4 | 2 | 28 | 2 | Grama,Flor/Água
+15 | 60 | 4 | 2 | 30 | 2 | Grama Escura,Flor/Água
+16 | 64 | 4 | 2 | 32 | 3 | Terra,Flor/Água
+17 | 68 | 5 | 2 | 34 | 3 | Areia,Flor/Água
+18 | 72 | 5 | 2 | 36 | 3 | Grama,Terra,Areia/Tronco,Pedra,Cimento,Água
+19 | 76 | 5 | 2 | 38 | 4 | Grama,Grama Escura,Terra,Areia/Tronco,Pedra,Cimento,Água
+20 | 80 | 5 | 2 | 40 | 5 | Grama,Flor,Grama Escura,Terra,Areia/Tronco,Pedra,Cimento,Água
+
+Npc: Sasuke, Sakura, Kakashi, Konohamaru, Iruka.
+Chão: Grama, Flor, Grama Escura, Terra, Areia.
+Parede: Tronco, Pedra, Cimento, Água.
+Item: Lámen, Kunai, Pergaminho.

@@ -3,7 +3,6 @@ package com.kastorcode.main;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -24,7 +23,6 @@ import javax.imageio.ImageIO;
 import com.kastorcode.entities.BulletShoot;
 import com.kastorcode.entities.Enemy;
 import com.kastorcode.entities.Entity;
-import com.kastorcode.entities.Npc;
 import com.kastorcode.entities.Player;
 import com.kastorcode.graphics.Spritesheet;
 import com.kastorcode.graphics.UI;
@@ -34,6 +32,8 @@ import com.kastorcode.world.World;
 public class Game extends Window implements Runnable, KeyListener, MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 
+	private final int MAX_LEVEL = 20;
+
 	private Thread thread;
 
 	private boolean isRunning, restart = false, showGameOverMessage = true;
@@ -42,7 +42,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	
 	public static BufferedImage minimap;
 	
-	private int currentLevel = 1, maxLevel = 2, framesGameOverMessage = 0;
+	private int framesGameOverMessage = 0;
 	
 	public static List<Entity> entities;
 
@@ -54,7 +54,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	
 	public static World world;
 	
-	public static Player player;
+	public static Player player = null;
 	
 	public static Random rand;
 	
@@ -71,36 +71,43 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 	*/
 
 	public static String state = "MENU";
+
+	public static String[] bgSounds = new String[4];
 	
+	public static NewerSound bgSound;
+
+	public static boolean showMiniMap = false;
+
 	public boolean saveGame = false;
-	
+
 	public int[] pixels, mapLightPixels;
-	
+
 	public static int[] minimapPixels;
 
-	public static int entry = 1, begin = 2, playing = 3, sceneState = entry;
+	public static int
+		entry = 1, begin = 2, playing = 3,
+		sceneState = entry, currentLevel = 1;
 
 	public int sceneTime = 0, sceneMaxTime = 60 * 3;
 
 	public BufferedImage mapLight;
-	
+
 	public int mx, my;
 
 	// public int x, y;
-	
-	public Npc sasukeNpc;
 
 
 	public Game () {
 		super();
-		
-		Sound.BG_MUSIC.loop();
-		//NewerSound.BG_MUSIC.loop();
 
 		addKeyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
+		bgSounds[0] = "beautiful_green_wild_beast.wav";
+		bgSounds[1] = "fake.wav";
+		bgSounds[2] = "ripple.wav";
+		bgSounds[3] = "rock_lee_theme.wav";
 		rand = new Random();
 		ui = new UI();
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -123,10 +130,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		bullets = new ArrayList<BulletShoot>();
 		spritesheet = new Spritesheet("spritesheet.png");
 		player = new Player(0, 0, 16, 16, Spritesheet.getSprite(32, 0, 16, 16));
-		sasukeNpc = new Npc(32, 32, 16, 16, Spritesheet.getSprite(0, 9 * 16, 16, 16));
 
 		entities.add(player);
-		entities.add(sasukeNpc);
 
 		/* Load custom fonts
 		try {
@@ -137,7 +142,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		}
 		*/
 
-		world = new World("level1.png");
+		world = new World("level" + currentLevel + ".png");
 		minimap = new BufferedImage(World.WIDTH, World.HEIGHT, BufferedImage.TYPE_INT_RGB);
 		minimapPixels = ((DataBufferInt)minimap.getRaster().getDataBuffer()).getData();
 		menu = new Menu();
@@ -176,9 +181,24 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 				if (saveGame) {
 					saveGame = false;
-					String[] keys = { "level" };
-					int[] values = { currentLevel };
-					Menu.saveGame(keys, values, 10);
+
+					if (player.points > 0) {
+						String[] keys = {
+							"level",
+							"life",
+							"munition",
+							"points"
+						};
+
+						int[] values = {
+							currentLevel,
+							player.life,
+							player.munition,
+							player.points
+						};
+
+						Menu.saveGame(keys, values, 10);
+					}
 				}
 
 				restart = false;
@@ -197,11 +217,14 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 					sceneTime++;
 
 					if (sceneTime == sceneMaxTime) {
+						sceneTime = 0;
+						bgSound = new NewerSound("/bg/" + bgSounds[new Random().nextInt(4)]);
+						bgSound.loop();
 						sceneState = playing;
 					}
 				}
 				else if (sceneState == entry) {
-					if (player.getX() < 100) {
+					if (player.getX() < 16) {
 						player.x++;
 					}
 					else {
@@ -211,11 +234,11 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 				if (enemies.size() == 0) {
 					currentLevel++;
-					
-					if (currentLevel > maxLevel) {
+
+					if (currentLevel > MAX_LEVEL) {
 						currentLevel = 1;
 					}
-					
+
 					String newWorld = "level" + currentLevel + ".png";
 					over(newWorld);
 				}
@@ -240,6 +263,8 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			}
 			
 			case "MENU": {
+				if (bgSound != null) { bgSound.pause(); }
+
 				player.updateCamera();
 				menu.tick();
 				break;
@@ -249,6 +274,10 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 
 	public static void over (String level) {
+		if (bgSound != null) {
+			bgSound.stop();
+		}
+
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
 		spritesheet = new Spritesheet("spritesheet.png");
@@ -257,10 +286,16 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		entities.add(player);
 
 		world = new World("/" + level);
+		minimap = new BufferedImage(World.WIDTH, World.HEIGHT, BufferedImage.TYPE_INT_RGB);
+		minimapPixels = ((DataBufferInt)minimap.getRaster().getDataBuffer()).getData();
+
+		Game.player.x = -32;
+		sceneState = entry;
+		Game.player.updateCamera();
 		return;
 	}
-	
-	
+
+
 	/*
 	public void drawRectangleExample (int xOff, int yOff) {
 		for (int x = 0; x < 32; x++) {
@@ -302,7 +337,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 		g.setColor(new Color(0, 0, 0));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
-		
+
 		world.render(g);
 		Collections.sort(entities, Entity.nodeSorter);
 
@@ -319,28 +354,33 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 
 		ui.render(g);
 
-		g.dispose();
+		if (showMiniMap) {
+			World.renderMinimap();
+			g.drawImage(minimap, WIDTH - World.WIDTH - 4, 21, World.WIDTH, World.HEIGHT, null);
+		}
 
-		g = bs.getDrawGraphics();
-		
-		// drawRectangleExample(x, y);
-
-		g.drawImage(image, 0, 0, Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height, null);
+		if (sceneState == begin) {
+			g.setFont(new Font("arial", Font.BOLD, 14));
+			g.setColor(Color.YELLOW);
+			g.drawString("Ready?", (int)(Window.WIDTH / 2.25), Window.HEIGHT / 2);
+		}
 
 		switch (state) {
 			case "GAME_OVER": {
-				Graphics2D g2 = (Graphics2D)g;
-	
-				g2.setColor(new Color(0, 0, 0, 100));
-				g2.fillRect(0, 0, Window.WIDTH * Window.SCALE, Window.HEIGHT * Window.SCALE);
-	
-				g.setFont(new Font("arial", Font.BOLD, 32));
+				g.setColor(new Color(255, 0, 255, 127));
+				g.fillRect(0, 0, Window.WIDTH, Window.HEIGHT);
+
+				g.setFont(new Font("arial", Font.BOLD, 12));
 				g.setColor(Color.WHITE);
-				g.drawString("Game Over", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2);
-	
+				g.drawString("Game Over", Window.WIDTH / 3, (int)(Window.HEIGHT / 2.5));
+
 				if (showGameOverMessage) {
-					g.setFont(new Font("arial", Font.PLAIN, 16));
-					g.drawString("> Pressione Enter para reiniciar", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2 + 32);
+					g.setFont(new Font("arial", Font.PLAIN, 10));
+					g.drawString("> Press Enter to restart", Window.WIDTH / 3, Window.HEIGHT / 2);
+				}
+
+				if (Game.player.y > 0) {
+					Game.player.y -= 3;
 				}
 	
 				break;
@@ -351,7 +391,20 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 				break;
 			}
 		}
+
+		g.dispose();
+
+		g = bs.getDrawGraphics();
 		
+		// drawRectangleExample(x, y);
+
+		if (fullScreen) {
+			g.drawImage(image, 0, 0, Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height, null);
+		}
+		else {
+			g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
+		}
+
 		/* Rotates objects based on mouse
 		Graphics2D g2 = (Graphics2D)g;
 		double mouseAngle = Math.atan2(225 - my, 225 - mx);
@@ -359,15 +412,6 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 		g.setColor(Color.RED);
 		g.fillRect(200, 200, 50, 50);
 		*/
-
-		World.renderMinimap();
-		g.drawImage(minimap, 618, 70, World.WIDTH * 5, World.HEIGHT * 5, null);
-
-		if (sceneState == begin) {
-			g.setFont(new Font("arial", Font.BOLD, 32));
-			g.setColor(Color.WHITE);
-			g.drawString("Prepare-se... O jogo vai começar!", (Window.WIDTH * Window.SCALE) / 2 - 96, (Window.HEIGHT * Window.SCALE) / 2);
-		}
 
 		bs.show();
 	}
@@ -429,7 +473,7 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 			case KeyEvent.VK_SPACE: {
 				player.shoot = true;
 			}
-			
+
 			case KeyEvent.VK_ENTER:
 			case KeyEvent.VK_SHIFT: {
 				restart = true;
@@ -452,6 +496,12 @@ public class Game extends Window implements Runnable, KeyListener, MouseListener
 				if (state == "NORMAL") {
 					saveGame = true;
 				}
+				break;
+			}
+
+			case KeyEvent.VK_F:
+			case KeyEvent.VK_F11: {
+				toggleFullScreen();
 				break;
 			}
 		}

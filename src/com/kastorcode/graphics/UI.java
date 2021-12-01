@@ -11,16 +11,18 @@ import com.kastorcode.main.Window;
 public class UI {
 	public void render (Graphics g) {
 		g.setColor(Color.RED);
-		g.fillRect(Window.WIDTH - 54, 4, 50, 8);
+		g.fillRect(Window.WIDTH - 36, 4, 32, 5);
 
 		g.setColor(Color.GREEN);
-		g.fillRect(Window.WIDTH - 54, 4, (int)((Game.player.life / Game.player.maxLife) * 50), 8);
-		
+		g.fillRect(Window.WIDTH - 36, 4, Game.player.life * 32 / Game.player.MAX_LIFE, 5);
+
 		g.setColor(Color.WHITE);
-		g.setFont(new Font("arial", Font.BOLD, 8));
-		g.drawString(Integer.toString((int)Game.player.life), Window.WIDTH - 35, 11);
-		
+		g.setFont(new Font("arial", Font.BOLD, 7));
+		g.drawString(Integer.toString(Game.player.life), Window.WIDTH - 28, 9);
+
 		g.setFont(new Font("arial", Font.PLAIN, 7));
-		g.drawString("Munição: " + Game.player.munition, Window.WIDTH - 45, 20);
+		g.drawString(Game.player.munition + " kunais", Window.WIDTH - 37, 17);
+
+		g.drawString(Game.player.points + " points", 4, 9);
 	}
 }

@@ -4,46 +4,43 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 
 
+@SuppressWarnings("deprecation")
 public class Sound {
 	private AudioClip clip;
-	
-	public static final Sound BG_MUSIC = new Sound("bgmusic.wav");
-
-	public static final Sound HURT_EFFECT = new Sound("hurt.wav");
 
 
-	@SuppressWarnings("deprecation")
-	private Sound (String name) {
+	public Sound (String name) {
 		try {
 			clip = Applet.newAudioClip(
-				Sound.class.getResource("/sounds/" + name)
+				Sound.class.getResource("/sounds" + name)
 			);
+
+			clip.play();
+			clip.stop();
 		}
 		catch (Throwable error) {}
 	}
-	
-	
+
+
 	public void play () {
 		try {
-			new Thread() {
-				public void run () {
-					clip.play();
-				}
-			}
-			.start();
+			clip.play();
 		}
 		catch (Throwable error) {}
 	}
-	
-	
+
+
+	public void stop () {
+		try {
+			clip.stop();
+		}
+		catch (Throwable error) {}
+	}
+
+
 	public void loop () {
 		try {
-			new Thread() {
-				public void run () {
-					clip.loop();
-				}
-			}
-			.start();
+			clip.loop();
 		}
 		catch (Throwable error) {}
 	}

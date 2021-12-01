@@ -11,30 +11,120 @@ import com.kastorcode.world.AStar;
 import com.kastorcode.world.Camera;
 import com.kastorcode.world.Tile;
 import com.kastorcode.world.Vector2i;
-import com.kastorcode.world.World;
 
 
 public class Enemy extends Entity {
+	public static final int LIFE = 8;
+
+	private final double
+		SPEED = 0.6, MAX_SPEED = 1.6;
+
 	public int rightDirection = 0, leftDirection = 1,
 			direction = rightDirection;
 
-	private double speed = 0.6;
-	
-	private int frames = 0, maxFrames = 5,
+	private double speed;
+
+	private int
+		life = LIFE, frames = 0, maxFrames = 5,
 		frameIndex = 0, maxFrameIndex = maxFrames - 1,
-		damageFrames = 0, life = 10;
+		damageFrames = 0;
+
+	private boolean moved = false;
+
+	public boolean isDamaged = false, pursue = false;
 	
-	private boolean moved = false, pursue = false;
-	
-	public boolean isDamaged = false;
-	
-	private BufferedImage[] rightEnemy, leftEnemy;
-	
-	public BufferedImage[] damageRightEnemy, damageLeftEnemy;
+	private static BufferedImage[] rightEnemy, leftEnemy;
+
+	public static BufferedImage[] damageRightEnemy, damageLeftEnemy;
+
+	private static final Sound hurt = new Sound("/effects/hurt.wav");
 
 
 	public Enemy(double x, double y, int width, int height, BufferedImage sprite) {
 		super(x, y, width, height, sprite);
+
+		switch (Game.currentLevel) {
+			case 1: {
+				speed = SPEED;
+				break;
+			}
+			case 2: {
+				speed = SPEED + 0.10;
+				break;
+			}
+			case 3: {
+				speed = SPEED + 0.15;
+				break;
+			}
+			case 4: {
+				speed = SPEED + 0.20;
+				break;
+			}
+			case 5: {
+				speed = SPEED + 0.25;
+				break;
+			}
+			case 6: {
+				speed = SPEED + 0.30;
+				break;
+			}
+			case 7: {
+				speed = SPEED + 0.35;
+				break;
+			}
+			case 8: {
+				speed = SPEED + 0.40;
+				break;
+			}
+			case 9: {
+				speed = SPEED + 0.45;
+				break;
+			}
+			case 10: {
+				speed = SPEED + 0.50;
+				break;
+			}
+			case 11: {
+				speed = SPEED + 0.55;
+				break;
+			}
+			case 12: {
+				speed = SPEED + 0.60;
+				break;
+			}
+			case 13: {
+				speed = SPEED + 0.65;
+				break;
+			}
+			case 14: {
+				speed = SPEED + 0.70;
+				break;
+			}
+			case 15: {
+				speed = SPEED + 0.75;
+				break;
+			}
+			case 16: {
+				speed = SPEED + 0.80;
+				break;
+			}
+			case 17: {
+				speed = SPEED + 0.85;
+				break;
+			}
+			case 18: {
+				speed = SPEED + 0.90;
+				break;
+			}
+			case 19: {
+				speed = SPEED + 0.95;
+				break;
+			}
+			case 20: {
+				speed = MAX_SPEED;
+				break;
+			}
+		}
 		
 		rightEnemy = new BufferedImage[maxFrames];
 		leftEnemy = new BufferedImage[maxFrames];
@@ -161,18 +251,16 @@ public class Enemy extends Entity {
 					}
 				}
 				else {
-					if (Game.rand.nextInt(100) < 10) {
-						Sound.HURT_EFFECT.play();
+					if (Game.rand.nextInt(100) < 50) {
 						Game.player.isDamaged = true;
 						Game.player.life -= Game.rand.nextInt(3);
+						hurt.play();
 					}
 				}
 
-				if (Game.rand.nextInt(100) < 75) {
-					followPath(path);
-				}
-				
-				if (Game.rand.nextInt(100) < 5) {
+				followPath(path, speed);
+
+				if (Game.rand.nextInt(100) < 20) {
 					Vector2i start = new Vector2i((int)(x / 16), (int)(y / 16));
 					Vector2i end = new Vector2i((int)(Game.player.x / 16), (int)(Game.player.y / 16));
 					path = AStar.findPath(Game.world, start, end);
@@ -198,6 +286,7 @@ public class Enemy extends Entity {
 					
 			if (life < 1) {
 				destroySelf();
+				Game.player.points += Game.player.life;
 				return;
 			}
 	
@@ -230,7 +319,7 @@ public class Enemy extends Entity {
 			if (e instanceof BulletShoot) {
 				if (Entity.isColliding(this, e)) {
 					isDamaged = true;
-					life -= 5;
+					life -= Game.rand.nextInt(3);
 					Game.bullets.remove(i);
 					return;
 				}

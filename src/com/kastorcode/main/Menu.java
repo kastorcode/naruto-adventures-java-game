@@ -3,7 +3,6 @@ package com.kastorcode.main;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,7 +14,7 @@ import java.io.IOException;
 
 public class Menu {
 	public String[] options = {
-		"novo jogo", "carregar jogo", "sair"
+		"new game", "load game", "exit"
 	};
 	
 	public int
@@ -31,6 +30,13 @@ public class Menu {
 		pause = false,
 		saveExists = false,
 		saveGame = false;
+
+	public static final NewerSound menuSound = new NewerSound("/bg/main_theme.wav");
+
+
+	public Menu () {
+		menuSound.loop();
+	}
 
 
 	public void tick () {
@@ -54,8 +60,8 @@ public class Menu {
 			enter = false;
 
 			switch (options[currentOption]) {
-				case "continuar":
-				case "novo jogo": {
+				case "continue":
+				case "new game": {
 					if (!pause) {
 						File file = new File("save.txt");
 						
@@ -64,15 +70,22 @@ public class Menu {
 						}
 					}
 
+					menuSound.stop();
+
+					if (Game.bgSound != null) {
+						Game.bgSound.loop();
+					}
+
 					pause = false;
 					Game.state = "NORMAL";
 					break;
 				}
 				
-				case "carregar jogo": {
+				case "load game": {
 					File file = new File("save.txt");
 					
 					if (file.exists()) {
+						menuSound.stop();
 						String saver = loadGame(10);
 						applySave(saver);
 					}
@@ -80,7 +93,7 @@ public class Menu {
 					break;
 				}
 				
-				case "sair": {
+				case "exit": {
 					System.exit(1);
 					break;
 				}
@@ -101,17 +114,34 @@ public class Menu {
 		String[] keys = save.split("/");
 		
 		for (int i = 0; i < keys.length; i++) {
-			String[] key_value = keys[i].split(":");
-			
+			String[] key_value = keys[i].split(" ");
+
 			switch (key_value[0]) {
 				case "level": {
+					Game.currentLevel = Integer.parseInt(key_value[1]);
 					Game.over("level" + key_value[1] + ".png");
-					Game.state = "NORMAL";
-					pause = false;
+					break;
+				}
+
+				case "life": {
+					Game.player.life = Integer.parseInt(key_value[1]);
+					break;
+				}
+
+				case "munition": {
+					Game.player.munition = Integer.parseInt(key_value[1]);
+					break;
+				}
+
+				case "points": {
+					Game.player.points = Integer.parseInt(key_value[1]);
 					break;
 				}
 			}
 		}
+
+		Game.state = "NORMAL";
+		pause = false;
 	}
 
 
@@ -129,17 +159,17 @@ public class Menu {
 				
 				try {
 					while ((singleLine = reader.readLine()) != null) {
-						String[] key = singleLine.split(":");
+						String[] key = singleLine.split(" ");
 						char[] value = key[1].toCharArray();
 						key[1] = "";
-						
+
 						for (int i = 0; i < value.length; i++) {
 							value[i] -= encode;
 							key[1] += value[i];
 						}
 						
 						line += key[0];
-						line += ":";
+						line += " ";
 						line += key[1];
 						line += "/";
 					}
@@ -165,7 +195,7 @@ public class Menu {
 		
 		for (int i = 0; i < keys.length; i++) {
 			String key = keys[i];
-			key += ":";
+			key += " ";
 			char[] value = Integer.toString(values[i]).toCharArray();
 			
 			for (int j = 0; j < value.length; j++) {
@@ -192,25 +222,27 @@ public class Menu {
 
 
 	public void render (Graphics g) {
-		Graphics2D g2 = (Graphics2D)g;
-		g2.setColor(new Color(0, 0, 0, 178));
-		g2.fillRect(0, 0, Window.WIDTH * Window.SCALE, Window.HEIGHT * Window.SCALE);
-		
-		g.setColor(Color.ORANGE);
-		g.setFont(new Font("arial", Font.BOLD, 32));
-		g.drawString("NARUTO  ADVENTURES", (Window.WIDTH * Window.SCALE) / 5, (Window.HEIGHT * Window.SCALE) / 5);
+		g.setColor(new Color(0, 0, 0, 204));
+		g.fillRect(0, 0, Window.WIDTH, Window.HEIGHT);
 
-		g.setFont(new Font("arial", Font.BOLD, 24));
+		g.setColor(Color.ORANGE);
+		g.setFont(new Font("arial", Font.BOLD, 12));
+		g.drawString("NARUTO  ADVENTURES", Window.WIDTH / 5, Window.HEIGHT / 5);
+
+		g.setFont(new Font("arial", Font.BOLD, 10));
 		g.setColor(getColor(0));
+
 		if (pause) {
-			g.drawString("Continuar", (Window.WIDTH * Window.SCALE) / 5, (Window.HEIGHT * Window.SCALE) / 3);
+			g.drawString("Continue", Window.WIDTH / 5, Window.HEIGHT / 3);
 		}
 		else {
-			g.drawString("Novo jogo", (Window.WIDTH * Window.SCALE) / 5, (Window.HEIGHT * Window.SCALE) / 3);
+			g.drawString("New game", Window.WIDTH / 5, Window.HEIGHT / 3);
 		}
+
 		g.setColor(getColor(1));
-		g.drawString("Carregar jogo", (Window.WIDTH * Window.SCALE) / 5, (int)((Window.HEIGHT * Window.SCALE) / 2.4));
+		g.drawString("Load game", Window.WIDTH / 5, (int)(Window.HEIGHT / 2.3));
+
 		g.setColor(getColor(2));
-		g.drawString("Sair", (Window.WIDTH * Window.SCALE) / 5, (Window.HEIGHT * Window.SCALE) / 2);
+		g.drawString("Exit", Window.WIDTH / 5, (int)(Window.HEIGHT / 1.85));
 	}
 }
